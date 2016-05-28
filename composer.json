@@ -1,0 +1,22 @@
+{
+    "name": "exactdrive/app-nexus-api-php",
+    "description": "App Nexus API for PHP",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Moiz Merchant",
+            "email": "moiz@exactdrive.com"
+        },
+        {
+            "name": "David Lonjon",
+            "email": "david.lonjon@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+      "psr-0": {
+        "YonderWeb\\AppNexus": "src/"
+      }
+    },
+    "minimum-stability": "dev"
+}
