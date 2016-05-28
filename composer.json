@@ -12,7 +12,9 @@
             "email": "david.lonjon@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "monolog/monolog": "^1.19"
+    },
     "autoload": {
       "psr-0": {
         "YonderWeb\\AppNexus": "src/"
