@@ -30,7 +30,8 @@ class Monolog
     {
         if (!isset(self::$_instance)) {
             self::$_instance = new Logger('AppNexus');
-            self::$_instance->pushHandler(new StreamHandler(__DIR__.'/../../data/logs/appnexus.log', Logger::INFO));
+            $logDirectory = Api::getDataDirectory() . 'logs/';
+            self::$_instance->pushHandler(new StreamHandler($logDirectory . 'appnexus.log', Logger::INFO));
         }
 
         return self::$_instance;
