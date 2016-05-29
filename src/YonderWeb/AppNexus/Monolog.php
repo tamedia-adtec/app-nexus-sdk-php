@@ -1,24 +1,28 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
-class AppNexus_Monolog
+class Monolog
 {
     /**
-     * The monologger instance
+     * The monologger instance.
      *
      * @var string
      */
     protected static $_instance;
 
     /**
-     * Enable/disable logging
+     * Enable/disable logging.
+     *
      * @var string
      */
     protected static $_enableLogging;
 
     /**
-     * Get instance of monologger
+     * Get instance of monologger.
      *
      * @return Logger
      */
@@ -26,13 +30,15 @@ class AppNexus_Monolog
     {
         if (!isset(self::$_instance)) {
             self::$_instance = new Logger('AppNexus');
-            self::$_instance->pushHandler( new StreamHandler(__DIR__ . '/../../data/logs/appnexus.log', Logger::INFO) );
+            $logDirectory = Api::getDataDirectory() . 'logs/';
+            self::$_instance->pushHandler(new StreamHandler($logDirectory . 'appnexus.log', Logger::INFO));
         }
+
         return self::$_instance;
     }
 
     /**
-     * Log an info message
+     * Log an info message.
      *
      * @param string $message
      */
@@ -44,7 +50,7 @@ class AppNexus_Monolog
     }
 
     /**
-     * Enable/disable error logging
+     * Enable/disable error logging.
      *
      * @param bool $enable
      */
@@ -54,7 +60,7 @@ class AppNexus_Monolog
     }
 
     /**
-     * Get whether logging is enabled or not
+     * Get whether logging is enabled or not.
      *
      * @return bool
      */
@@ -66,5 +72,4 @@ class AppNexus_Monolog
 
         return self::$_enableLogging;
     }
-
 }

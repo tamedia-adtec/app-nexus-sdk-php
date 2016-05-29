@@ -1,7 +1,13 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
 // PixelService.php
 //-----------------------------------------------------------------------------
+
+
+namespace YonderWeb\AppNexus;
 
 /**
  * AppNexus Pixel Api service.
@@ -10,7 +16,7 @@
  * @author Moiz Merchant <moiz@exactdrive.com>
  * @version $Id$
  */
-class AppNexus_PixelService extends AppNexus_Api
+class PixelService extends Api
 {
 
     //-------------------------------------------------------------------------
@@ -46,7 +52,7 @@ class AppNexus_PixelService extends AppNexus_Api
      */
     public static function getBaseUrl()
     {
-        $url = AppNexus_Api::getBaseUrl() . '/pixel';
+        $url = Api::getBaseUrl() . '/pixel';
         return $url;
     }
 
@@ -73,10 +79,10 @@ class AppNexus_PixelService extends AppNexus_Api
         }
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::POST, $data);
+        $response = self::makeRequest($url, Api::POST, $data);
 
         // wrap response with app nexus object
-        return new AppNexus_Object($response, AppNexus_Object::MODE_READ_WRITE);
+        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -104,10 +110,10 @@ class AppNexus_PixelService extends AppNexus_Api
         }
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::PUT, $data);
+        $response = self::makeRequest($url, Api::PUT, $data);
 
         // wrap response with app nexus object
-        return new AppNexus_Object($response, AppNexus_Object::MODE_READ_WRITE);
+        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -118,8 +124,7 @@ class AppNexus_PixelService extends AppNexus_Api
      * @param  int   $advertiserId
      * @return array $pixels
      */
-    public static function getAllPixels($advertiserId = null,
-        $start_element = 0, $num_elements = 100)
+    public static function getAllPixels($advertiserId = null, $start_element = 0, $num_elements = 100)
     {
         // construct query
         $query = array(
@@ -136,10 +141,10 @@ class AppNexus_PixelService extends AppNexus_Api
         $url = self::getBaseUrl() . '?' . http_build_query($query);
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_WRITE);
+        return new AppNexusArray($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -158,7 +163,7 @@ class AppNexus_PixelService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response to be an array if only single result queried
         if (count($ids) == 1) {
@@ -167,7 +172,7 @@ class AppNexus_PixelService extends AppNexus_Api
         }
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_WRITE);
+        return new AppNexusArray($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -186,10 +191,10 @@ class AppNexus_PixelService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Object($response, AppNexus_Object::MODE_READ_WRITE);
+        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -210,7 +215,7 @@ class AppNexus_PixelService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::DELETE);
+        $response = self::makeRequest($url, Api::DELETE);
 
         return true;
     }

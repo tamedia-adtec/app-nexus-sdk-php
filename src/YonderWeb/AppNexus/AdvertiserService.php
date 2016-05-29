@@ -1,4 +1,7 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
 // AdvertiserService.php
 //-----------------------------------------------------------------------------
@@ -10,7 +13,7 @@
  * @author Moiz Merchant <moiz@exactdrive.com>
  * @version $Id$
  */
-class AppNexus_AdvertiserService extends AppNexus_Api
+class AdvertiserService extends Api
 {
 
     //-------------------------------------------------------------------------
@@ -46,7 +49,7 @@ class AppNexus_AdvertiserService extends AppNexus_Api
      */
     public static function getBaseUrl()
     {
-        $url = AppNexus_Api::getBaseUrl() . '/advertiser';
+        $url = Api::getBaseUrl() . '/advertiser';
         return $url;
     }
 
@@ -70,9 +73,9 @@ class AppNexus_AdvertiserService extends AppNexus_Api
         }
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::POST, $data);
+        $response = self::makeRequest($url, Api::POST, $data);
 
-        return new AppNexus_Object($response, AppNexus_Object::MODE_READ_WRITE);
+        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -98,9 +101,9 @@ class AppNexus_AdvertiserService extends AppNexus_Api
         }
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::PUT, $data);
+        $response = self::makeRequest($url, Api::PUT, $data);
 
-        return new AppNexus_Object($response, AppNexus_Object::MODE_READ_WRITE);
+        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -120,10 +123,10 @@ class AppNexus_AdvertiserService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_WRITE);
+        return new AppNexusArray($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -149,10 +152,10 @@ class AppNexus_AdvertiserService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_WRITE);
+        return new AppNexusArray($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -171,10 +174,10 @@ class AppNexus_AdvertiserService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Object($response, AppNexus_Object::MODE_READ_WRITE);
+        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -197,10 +200,10 @@ class AppNexus_AdvertiserService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_WRITE);
+        return new AppNexusArray($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -219,7 +222,7 @@ class AppNexus_AdvertiserService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::DELETE);
+        $response = self::makeRequest($url, Api::DELETE);
 
         return true;
     }
@@ -243,10 +246,10 @@ class AppNexus_AdvertiserService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Object($response, AppNexus_Object::MODE_READ_WRITE);
+        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------

@@ -1,19 +1,21 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
-// Object.php
+// AppNexusObject.php
 //-----------------------------------------------------------------------------
 
 /**
  * AppNexus API object class.  Generic wrapper object around AppNexus hashes
  *  enforcing reading/writing of keys.  Keys are converted into properties.
  *
- * @package AppNexus
  * @author Moiz Merchant <moiz@exactdrive.com>
+ *
  * @version $Id$
  */
-class AppNexus_Object
+class AppNexusObject
 {
-
     //-------------------------------------------------------------------------
     // constants
     //-------------------------------------------------------------------------
@@ -23,7 +25,7 @@ class AppNexus_Object
      *  modified.  READ_WRITE allows only existing keys to be modified and
      *  tracks dirtiness of the object.
      */
-    const MODE_READ_ONLY  = 0;
+    const MODE_READ_ONLY = 0;
     const MODE_READ_WRITE = 1;
 
     //-------------------------------------------------------------------------
@@ -80,7 +82,7 @@ class AppNexus_Object
     /**
      * Run when writing data to inaccessible properties.
      */
-    public function __set ($name, $value)
+    public function __set($name, $value)
     {
         // only allow updating data if mode allows it
         if ($this->_mode == self::MODE_READ_WRITE) {
@@ -89,7 +91,7 @@ class AppNexus_Object
                 // only update the key if new and mark dirty
                 if ($this->_raw[$name] != $value) {
                     $this->_raw[$name] = $value;
-                    $this->_dirty      = true;
+                    $this->_dirty = true;
                 }
             }
         }
@@ -100,14 +102,14 @@ class AppNexus_Object
     /**
      * Utilized for reading data from inaccessible properties.
      */
-    public function __get ($name)
+    public function __get($name)
     {
         // only return values for keys in raw data
         if (array_key_exists($name, $this->_raw)) {
             return $this->_raw[$name];
         }
 
-        return null;
+        return;
     }
 
     //-------------------------------------------------------------------------
@@ -115,7 +117,7 @@ class AppNexus_Object
     /**
      * Triggered by calling isset() or empty() on inaccessible properties.
      */
-    public function __isset ($name)
+    public function __isset($name)
     {
         return isset($this->_raw[$name]);
     }
@@ -125,7 +127,7 @@ class AppNexus_Object
     /**
      * Invoked when unset() is used on inaccessible properties.
      */
-    public function __unset ($name)
+    public function __unset($name)
     {
         // don't allow unsetting of data, the keys/values in the raw data
         //  cannot be modified.
@@ -195,5 +197,4 @@ class AppNexus_Object
             return $data['output_term'];
         }
     }
-
 }

@@ -1,4 +1,7 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
 // DemographicAreaService.php
 //-----------------------------------------------------------------------------
@@ -10,7 +13,7 @@
  * @author Chris Mears <chris@exactdrive.com>
  * @version $Id$
  */
-class AppNexus_DemographicAreaService extends AppNexus_Api
+class DemographicAreaService extends Api
 {
 
     //-------------------------------------------------------------------------
@@ -37,7 +40,7 @@ class AppNexus_DemographicAreaService extends AppNexus_Api
      */
     public static function getBaseUrl()
     {
-        $url = AppNexus_Api::getBaseUrl() . '/dma';
+        $url = Api::getBaseUrl() . '/dma';
         return $url;
     }
 
@@ -57,10 +60,10 @@ class AppNexus_DemographicAreaService extends AppNexus_Api
          ));
 
          // query app nexus server
-         $response = self::makeRequest($url, AppNexus_Api::GET);
+         $response = self::makeRequest($url, Api::GET);
 
          // wrap response with app nexus object
-         return new AppNexus_Array($response, AppNexus_Object::MODE_READ_ONLY);
+         return new AppNexusArray($response, AppNexusObject::MODE_READ_ONLY);
      }
 
 }

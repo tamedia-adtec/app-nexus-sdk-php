@@ -1,4 +1,7 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
 // ContentCategoryService.php
 //-----------------------------------------------------------------------------
@@ -10,7 +13,7 @@
  * @author Chris Mears <chris@exactdrive.com>
  * @version $Id$
  */
-class AppNexus_ContentCategoryService extends AppNexus_Api
+class ContentCategoryService extends Api
 {
 
     //-------------------------------------------------------------------------
@@ -28,7 +31,7 @@ class AppNexus_ContentCategoryService extends AppNexus_Api
         'name',             // String
         'description',      // String
         'is_system',        // READ ONLY. Boolean
-        'parent_category',  // Object (see docs)
+        'parent_category',  // AppNexusObject (see docs)
         'type',             // Enum('standard')
         'last_modified',    // READ ONLY. timestamp
         'category_type'
@@ -43,7 +46,7 @@ class AppNexus_ContentCategoryService extends AppNexus_Api
      */
     public static function getBaseUrl()
     {
-        $url = AppNexus_Api::getBaseUrl() . '/content-category';
+        $url = Api::getBaseUrl() . '/content-category';
         return $url;
     }
 
@@ -65,10 +68,10 @@ class AppNexus_ContentCategoryService extends AppNexus_Api
          ));
 
          // query app nexus server
-         $response = self::makeRequest($url, AppNexus_Api::GET);
+         $response = self::makeRequest($url, Api::GET);
 
          // wrap response with app nexus object
-         return new AppNexus_Array($response, AppNexus_Object::MODE_READ_ONLY);
+         return new AppNexusArray($response, AppNexusObject::MODE_READ_ONLY);
      }
 
 }

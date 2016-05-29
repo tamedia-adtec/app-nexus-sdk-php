@@ -1,4 +1,7 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
 // Segment.php
 //-----------------------------------------------------------------------------
@@ -6,20 +9,19 @@
 /**
  * AppNexus Segment.
  *
- * @package AppNexus
  * @author Moiz Merchant <moiz@exactdrive.com>
+ *
  * @version $Id$
  */
-class AppNexus_Segment
+class Segment
 {
-
     //-------------------------------------------------------------------------
     // constants
     //-------------------------------------------------------------------------
 
     const FLAG_DELETED = 0x1;
-    const FLAG_EMAIL   = 0x2;
-    const FLAG_SYNC    = 0x4;
+    const FLAG_EMAIL = 0x2;
+    const FLAG_SYNC = 0x4;
 
     //-------------------------------------------------------------------------
     // static fields
@@ -28,10 +30,10 @@ class AppNexus_Segment
     /**
      * @var hash
      */
-    static public $expiryUnits = array(
+    public static $expiryUnits = array(
         'minute' => 'Minutes',
-        'hour'   => 'Hours',
-        'day'    => 'Days'
+        'hour' => 'Hours',
+        'day' => 'Days',
     );
 
     //-------------------------------------------------------------------------
@@ -49,7 +51,7 @@ class AppNexus_Segment
     protected $_data;
 
     /**
-     * @var AppNexus_Object
+     * @var object
      */
     protected $_appNexus;
 
@@ -60,9 +62,10 @@ class AppNexus_Segment
     /**
      * Add a new retargeting pixel to the database.
      *
-     * @param  int  $campaignId
-     * @param  hash $data
-     * @return AppNexus_Segment
+     * @param int  $campaignId
+     * @param hash $data
+     *
+     * @return Segment
      */
     public static function create($campaignId, $data)
     {
@@ -70,14 +73,14 @@ class AppNexus_Segment
         $pixelTable = new Campaigns_Model_DbTable_Pixels();
         $row = $pixelTable->createRow(array(
             'campaignId' => $campaignId,
-            'type'       => Campaigns_Model_DbTable_Pixels::TYPE_RETARGETING,
-            'name'       => $data['name'],
-            'data'       => json_encode($data),
-            'flags'      => self::FLAG_SYNC
+            'type' => Campaigns_Model_DbTable_Pixels::TYPE_RETARGETING,
+            'name' => $data['name'],
+            'data' => json_encode($data),
+            'flags' => self::FLAG_SYNC,
         ));
         $row->save();
 
-        return new AppNexus_Segment($row);
+        return new self($row);
     }
 
     //-------------------------------------------------------------------------
@@ -86,8 +89,8 @@ class AppNexus_Segment
 
     public function __construct($segmentRow)
     {
-        $this->row       = $segmentRow;
-        $this->_data     = null;
+        $this->row = $segmentRow;
+        $this->_data = null;
         $this->_appNexus = null;
     }
 
@@ -111,6 +114,7 @@ class AppNexus_Segment
         if ($this->_data == null) {
             $this->_data = json_decode($this->row->data, true);
         }
+
         return $this->_data;
     }
 
@@ -127,9 +131,10 @@ class AppNexus_Segment
             $data = json_decode($this->row->appNexusData, true);
             if ($data) {
                 $this->_appNexus =
-                    new AppNexus_Object($data, AppNexus_Object::MODE_READ_WRITE);
+                    new AppNexusObject($data, AppNexusObject::MODE_READ_WRITE);
             }
         }
+
         return $this->_appNexus;
     }
 
@@ -142,7 +147,7 @@ class AppNexus_Segment
      */
     public function getCampaign()
     {
-        return new AppNexus_Campaign($this->row->fetchCampaign());
+        return new Campaign($this->row->fetchCampaign());
     }
 
     //-------------------------------------------------------------------------
@@ -156,7 +161,7 @@ class AppNexus_Segment
      */
     public function isDeleted()
     {
-        return AppNexus_Flags::isFlagSet($this->row->flags, self::FLAG_DELETED);
+        return Flags::isFlagSet($this->row->flags, self::FLAG_DELETED);
     }
 
     //-------------------------------------------------------------------------
@@ -168,7 +173,7 @@ class AppNexus_Segment
      */
     public function shouldEmail()
     {
-        return AppNexus_Flags::isFlagSet($this->row->flags, self::FLAG_EMAIL);
+        return Flags::isFlagSet($this->row->flags, self::FLAG_EMAIL);
     }
 
     //-------------------------------------------------------------------------
@@ -180,7 +185,7 @@ class AppNexus_Segment
      */
     public function shouldSync()
     {
-        return AppNexus_Flags::isFlagSet($this->row->flags, self::FLAG_SYNC);
+        return Flags::isFlagSet($this->row->flags, self::FLAG_SYNC);
     }
 
     //-------------------------------------------------------------------------
@@ -188,33 +193,34 @@ class AppNexus_Segment
     /**
      * Update retargeting pixel data in database.
      *
-     * @param  hash $data
+     * @param hash $data
+     *
      * @return this
      */
     public function update($data)
     {
         $current = $this->getData();
-        $flags   = 0x0;
+        $flags = 0x0;
 
         // keys triggering sync
         $syncKeys = array(
             'name',
             'expiryType',
             'expiryAmount',
-            'expiryUnit'
+            'expiryUnit',
         );
 
         // check if changes require sync
         foreach ($syncKeys as $key) {
             if ($current[$key] != $data[$key]) {
-                AppNexus_Flags::setFlag($flags, self::FLAG_SYNC);
+                Flags::setFlag($flags, self::FLAG_SYNC);
                 break;
             }
         }
 
         // save data
-        $this->row->name   = $data['name'];
-        $this->row->data   = json_encode($data);
+        $this->row->name = $data['name'];
+        $this->row->data = json_encode($data);
         $this->row->flags |= $flags;
         $this->row->save();
 
@@ -233,11 +239,11 @@ class AppNexus_Segment
     {
         // grab appnexus data
         $advertiserId = $this->row->fetchAppNexusAdvertiserId();
-        $syncData     = $this->_getSyncData();
+        $syncData = $this->_getSyncData();
 
         // create new segment
         if ($this->getAppNexusData() == null) {
-            $segment = AppNexus_SegmentService::addSegment(
+            $segment = SegmentService::addSegment(
                 $syncData, $advertiserId);
 
             // pixel should be emailed after inital sync
@@ -246,7 +252,7 @@ class AppNexus_Segment
         // update existing segment
         } else {
             $pixelId = $this->getAppNexusData()->id;
-            $segment = AppNexus_SegmentService::updateSegment(
+            $segment = SegmentService::updateSegment(
                 $pixelId, $syncData, $advertiserId);
         }
 
@@ -263,7 +269,8 @@ class AppNexus_Segment
     /**
      * Update pixels deleted status.
      *
-     * @param  bool $delete
+     * @param bool $delete
+     *
      * @return this
      */
     public function setDeleted($delete)
@@ -273,11 +280,11 @@ class AppNexus_Segment
             $flags = $this->row->flags;
 
             // update flags
-            AppNexus_Flags::setFlag($flags, self::FLAG_SYNC);
+            Flags::setFlag($flags, self::FLAG_SYNC);
             if ($delete) {
-                AppNexus_Flags::setFlag($flags, self::FLAG_DELETED);
+                Flags::setFlag($flags, self::FLAG_DELETED);
             } else {
-                AppNexus_Flags::unsetFlag($flags, self::FLAG_DELETED);
+                Flags::unsetFlag($flags, self::FLAG_DELETED);
             }
 
             // save to db
@@ -298,6 +305,7 @@ class AppNexus_Segment
     public function clearEmailFlag()
     {
         $this->_clearFlag(self::FLAG_EMAIL);
+
         return $this;
     }
 
@@ -311,6 +319,7 @@ class AppNexus_Segment
     public function clearSyncFlag()
     {
         $this->_clearFlag(self::FLAG_SYNC);
+
         return $this;
     }
 
@@ -324,7 +333,7 @@ class AppNexus_Segment
     public function generateTag()
     {
         // grab pixel
-        $pixel  = $this->getData();
+        $pixel = $this->getData();
         $jsType = $pixel['tagType'] == 'javascript';
         $secure = $pixel['securityType'] == 'secure';
 
@@ -354,9 +363,9 @@ class AppNexus_Segment
 
         // url depends on security option
         if ($secure) {
-            $url = "https://secure.adnxs.com";
+            $url = 'https://secure.adnxs.com';
         } else {
-            $url = "http://ads.exactdrive.com";
+            $url = 'http://ads.exactdrive.com';
         }
 
         // tag depends on type
@@ -370,9 +379,9 @@ class AppNexus_Segment
 
         // generate tag
         $html =
-            "<!-- Segment Pixel - {$this->row->name} - DO NOT MODIFY -->" . PHP_EOL .
-            $tag . PHP_EOL .
-            "<!-- End of Segment Pixel -->";
+            "<!-- Segment Pixel - {$this->row->name} - DO NOT MODIFY -->".PHP_EOL.
+            $tag.PHP_EOL.
+            '<!-- End of Segment Pixel -->';
 
         return $html;
     }
@@ -385,8 +394,8 @@ class AppNexus_Segment
     protected function _clearFlag($flag)
     {
         $flags = $this->row->flags;
-        if (AppNexus_Flags::isFlagSet($flags, $flag)) {
-            AppNexus_Flags::unsetFlag($flags, $flag);
+        if (Flags::isFlagSet($flags, $flag)) {
+            Flags::unsetFlag($flags, $flag);
             $this->row->flags = $flags;
             $this->row->save();
         }
@@ -402,7 +411,7 @@ class AppNexus_Segment
     protected function _getSyncData()
     {
         $campaign = $this->getCampaign();
-        $data     = $this->getData();
+        $data = $this->getData();
 
         // calculate expiration minutes
         if ($data['expiryType'] == 'no-expire') {
@@ -423,17 +432,16 @@ class AppNexus_Segment
         }
 
         // construct sync hash
-        $deleted  = $this->isDeleted();
-        $status   = $deleted ? ' (inactive)' : '';
-        $name     = "{$campaign->row->name} - {$this->row->name}" . $status;
+        $deleted = $this->isDeleted();
+        $status = $deleted ? ' (inactive)' : '';
+        $name = "{$campaign->row->name} - {$this->row->name}".$status;
         $syncData = array(
-            'code'           => "pixel-{$this->row->id}_campaign-{$campaign->row->id}",
-            'state'          => $deleted ? 'inactive' : 'active',
-            'short_name'     => $name,
-            'expire_minutes' => $minutes
+            'code' => "pixel-{$this->row->id}_campaign-{$campaign->row->id}",
+            'state' => $deleted ? 'inactive' : 'active',
+            'short_name' => $name,
+            'expire_minutes' => $minutes,
         );
 
         return $syncData;
     }
-
 }

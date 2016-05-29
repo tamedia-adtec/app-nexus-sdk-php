@@ -1,4 +1,7 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
 // SavedReportService.php
 //-----------------------------------------------------------------------------
@@ -10,7 +13,7 @@
  * @author Moiz Merchant <moiz@exactdrive.com>
  * @version $Id$
  */
-class AppNexus_SavedReportService extends AppNexus_Api
+class SavedReportService extends Api
 {
 
     //-------------------------------------------------------------------------
@@ -44,7 +47,7 @@ class AppNexus_SavedReportService extends AppNexus_Api
      */
     public static function getBaseUrl()
     {
-        $url = AppNexus_Api::getBaseUrl() . '/saved-report';
+        $url = Api::getBaseUrl() . '/saved-report';
         return $url;
     }
 
@@ -71,7 +74,7 @@ class AppNexus_SavedReportService extends AppNexus_Api
         }
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::POST, $data);
+        $response = self::makeRequest($url, Api::POST, $data);
 
         return $response['id'];
     }
@@ -101,7 +104,7 @@ class AppNexus_SavedReportService extends AppNexus_Api
         }
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::PUT, $data);
+        $response = self::makeRequest($url, Api::PUT, $data);
 
         return $response['id'];
     }
@@ -125,10 +128,10 @@ class AppNexus_SavedReportService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_WRITE);
+        return new AppNexusArray($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -147,10 +150,10 @@ class AppNexus_SavedReportService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Object($response, AppNexus_Object::MODE_READ_WRITE);
+        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -169,7 +172,7 @@ class AppNexus_SavedReportService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::DELETE);
+        $response = self::makeRequest($url, Api::DELETE);
 
         return true;
     }

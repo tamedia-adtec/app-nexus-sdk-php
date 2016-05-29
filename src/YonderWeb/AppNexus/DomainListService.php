@@ -1,4 +1,7 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
 // DomainListService.php
 //-----------------------------------------------------------------------------
@@ -6,20 +9,19 @@
 /**
  * AppNexus Domain List API service.
  *
- * @package AppNexus
  * @author Chris Mears <chris@exactdrive.com>
+ *
  * @version $Id$
  */
-class AppNexus_DomainListService extends AppNexus_Api
+class DomainListService extends Api
 {
-
     //-------------------------------------------------------------------------
     // static fields
     //-------------------------------------------------------------------------
 
     /**
      * Domain List properties.
-     * https://wiki.appnexus.com/display/api/Domain+List+Service#DomainListService-JSONFields
+     * https://wiki.appnexus.com/display/api/Domain+List+Service#DomainListService-JSONFields.
      *
      * @var array
      */
@@ -29,7 +31,7 @@ class AppNexus_DomainListService extends AppNexus_Api
         'description',  // String
         'type',         // ['white', 'black']
         'domains',      // Array of Strings,
-        'last_modified' // String
+        'last_modified', // String
     );
 
     //-------------------------------------------------------------------------
@@ -41,17 +43,18 @@ class AppNexus_DomainListService extends AppNexus_Api
      */
     public static function getBaseUrl()
     {
-        $url = AppNexus_Api::getBaseUrl() . '/domain-list';
+        $url = Api::getBaseUrl().'/domain-list';
+
         return $url;
     }
 
     //-------------------------------------------------------------------------
 
-    /**
-     * Add a new Domain List
-     *
-     * @return array $domainList
-     */
+     /**
+      * Add a new Domain List.
+      *
+      * @return array $domainList
+      */
      public static function addDomainList($domainListData)
      {
          // construct url
@@ -60,13 +63,13 @@ class AppNexus_DomainListService extends AppNexus_Api
          // package up the data, don't bother running query on invalid data
          $data = self::_createHash($domainListData);
          if ($data == null) {
-             return null;
+             return;
          }
 
          // query app nexus server
-         $response = self::makeRequest($url, AppNexus_Api::POST, $data);
+         $response = self::makeRequest($url, Api::POST, $data);
 
-         return new AppNexus_Object($response, AppNexus_Object::MODE_READ_WRITE);
+         return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
      }
 
      /**
@@ -74,25 +77,26 @@ class AppNexus_DomainListService extends AppNexus_Api
       *
       * @param  int  $id           => Id of domain list.
       * @param  hash $domainList   => Only valid fields will be passed to api.
+      *
       * @return hash $domainList   => Updated domain list.
       */
      public static function updateDomainList($id, $domainListData)
      {
          // construct url
-         $url = self::getBaseUrl() . '?' . http_build_query(array(
-             'id' => $id
+         $url = self::getBaseUrl().'?'.http_build_query(array(
+             'id' => $id,
          ));
 
          // package up the data, don't bother running query on invalid data
          $data = self::_createHash($domainListData);
          if ($data == null) {
-             return null;
+             return;
          }
 
          // query app nexus server
-         $response = self::makeRequest($url, AppNexus_Api::PUT, $data);
+         $response = self::makeRequest($url, Api::PUT, $data);
 
-         return new AppNexus_Object($response, AppNexus_Object::MODE_READ_WRITE);
+         return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
      }
 
      //-------------------------------------------------------------------------
@@ -104,6 +108,7 @@ class AppNexus_DomainListService extends AppNexus_Api
       *   updated in the format accepted by AppNexus.
       *
       * @param  hash $data
+      *
       * @return hash $data
       */
      private static function _createHash($data)
@@ -118,5 +123,4 @@ class AppNexus_DomainListService extends AppNexus_Api
          // return null if no valid fields found
          return empty($pruned) ? null : (object) array('domain-list' => $pruned);
      }
-
 }

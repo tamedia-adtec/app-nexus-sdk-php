@@ -1,6 +1,9 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
-// Aray.php
+// AppNexusArray.php
 //-----------------------------------------------------------------------------
 
 /**
@@ -11,7 +14,7 @@
  * @author Moiz Merchant <moiz@exactdrive.com>
  * @version $Id$
  */
-class AppNexus_Array implements ArrayAccess, IteratorAggregate, Countable
+class AppNexusArray implements \ArrayAccess, \IteratorAggregate, \Countable
 {
 
     //-------------------------------------------------------------------------
@@ -58,7 +61,7 @@ class AppNexus_Array implements ArrayAccess, IteratorAggregate, Countable
         // set the raw data
         $this->_array = array();
         foreach ($response[$key] as $element) {
-            array_push($this->_array, new AppNexus_Object($element, $mode));
+            array_push($this->_array, new AppNexusObject($element, $mode));
         }
 
         // update management variables
