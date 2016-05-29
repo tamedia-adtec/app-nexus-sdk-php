@@ -2,6 +2,9 @@
 
 namespace YonderWeb\AppNexus;
 
+use League\Flysystem\Filesystem;
+use League\Flysystem\Adapter\Local;
+
 //-----------------------------------------------------------------------------
 // Api.php
 //-----------------------------------------------------------------------------
@@ -99,6 +102,8 @@ class Api
 
     private static $tokenFile;
 
+    private static $_dataDirectory;
+
     //-------------------------------------------------------------------------
     // static properties
     //-------------------------------------------------------------------------
@@ -192,6 +197,38 @@ class Api
         return self::$_userName;
     }
 
+    //-------------------------------------------------------------------------
+
+    /**
+     * Set the AppNexus api data directory.
+     *
+     * @param string $dataDirectory
+     */
+    public static function setDataDirectory($dataDirectory = '')
+    {
+        self::$_dataDirectory = $dataDirectory;
+        if ('' === self::$_dataDirectory) {
+            self::$_dataDirectory = __DIR__ . '/../../../data/';
+        }
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Get the AppNexus api data directory.
+     *
+     * @return string
+     *
+     * @throws Exception
+     */
+    public static function getDataDirectory()
+    {
+        if (!self::$_dataDirectory) {
+            self::$_dataDirectory = __DIR__ . '/../../../data/';
+        }
+
+        return self::$_dataDirectory;
+    }
 
     //-------------------------------------------------------------------------
 
@@ -202,9 +239,9 @@ class Api
      */
     public static function setTokenFile($tokenFile = '')
     {
-        if (!$tokenFile) {
-            self::$tokenFile = __DIR__ . '/../../../.appnexus_token';
-
+        self::$tokenFile = $tokenFile;
+        if ('' !== self::$tokenFile) {
+            self::$tokenFile = '.appnexus_token';
         }
     }
 
@@ -220,12 +257,16 @@ class Api
     public static function getTokenFile()
     {
         if (!self::$tokenFile) {
-            throw new \Exception('AppNexus token file does not exists.');
+            self::$tokenFile = '.appnexus_token';
         }
 
         return self::$tokenFile;
     }
 
+    private static function getFileSystem() {
+        $adapter = new Local(self::getDataDirectory());
+        return new Filesystem($adapter);
+    }
     //-------------------------------------------------------------------------
     // static methods
     //-------------------------------------------------------------------------
@@ -425,9 +466,12 @@ class Api
             'created' => time(),
         );
 
+        $fileSystem = self::getFileSystem();
+        $tokenFile = self::getTokenFile();
+
         if (!self::$_token) {
-            if (file_exists(self::$tokenFile)) {
-                $token = unserialize(file_get_contents(self::$tokenFile));
+            if ($fileSystem->has($tokenFile)) {
+                $token = unserialize($fileSystem->read($tokenFile));
             }
         } else {
             $token = self::$_token;
@@ -437,7 +481,7 @@ class Api
         if (time() - $token['created'] > 7200 || '' === $token['token'] || $force) {
             $token['token'] = self::_requestAuthenticationToken();
             $token['created'] = time();
-            file_put_contents(self::$tokenFile, serialize($token));
+            $fileSystem->write($tokenFile, serialize($token));
         }
 
         self::$_token = $token;
