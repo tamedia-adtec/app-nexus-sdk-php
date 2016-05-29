@@ -97,6 +97,8 @@ class Api
      */
     private static $_token;
 
+    private static $tokenFile;
+
     //-------------------------------------------------------------------------
     // static properties
     //-------------------------------------------------------------------------
@@ -190,6 +192,40 @@ class Api
         return self::$_userName;
     }
 
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Set the AppNexus Api Token file.
+     *
+     * @param string $tokenFile
+     */
+    public static function setTokenFile($tokenFile = '')
+    {
+        if (!$tokenFile) {
+            self::$tokenFile = __DIR__ . '/../../../.appnexus_token';
+
+        }
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Get the AppNexus Api Token File.
+     *
+     * @return string
+     *
+     * @throws Exception
+     */
+    public static function getTokenFile()
+    {
+        if (!self::$tokenFile) {
+            throw new \Exception('AppNexus token file does not exists.');
+        }
+
+        return self::$tokenFile;
+    }
+
     //-------------------------------------------------------------------------
     // static methods
     //-------------------------------------------------------------------------
@@ -204,8 +240,7 @@ class Api
      *
      * @return array $response
      */
-    protected static function makeRequestRaw($url, $type = self::GET,
-        $data = null)
+    protected static function makeRequestRaw($url, $type = self::GET, $data = null)
     {
         // spit out debug info to app nexus logs
         Monolog::addInfo("Url: $url");
@@ -385,31 +420,27 @@ class Api
      */
     private static function _getAuthenticationToken($force = false)
     {
-        // cache token from database
+        $token = array(
+            'token' => '',
+            'created' => time(),
+        );
+
         if (!self::$_token) {
-            $model = new Model_DbTable_AppNexus();
-            $row = $model->find(1)->current();
-            self::$_token = $row->toArray();
+            if (file_exists(self::$tokenFile)) {
+                $token = unserialize(file_get_contents(self::$tokenFile));
+            }
+        } else {
+            $token = self::$_token;
         }
 
-        // request a new token if older than 2 hours
-        if (Model_DbTable_Row::
-            isMoreThanTwoHoursOld(self::$_token['created']) ||
-            (self::$_token['token'] == '')                  ||
-            $force) {
-
-            // request a new token from AppNexus
-            $token = self::_requestAuthenticationToken();
-
-            // cache in database
-            $model = new Model_DbTable_AppNexus();
-            $row = $model->find(1)->current();
-            $row->saveToken($token);
-
-            // cache locally
-            self::$_token = $row->toArray();
+        // request a new token if older than 2 hours, if it does not exists or if forced to renew
+        if (time() - $token['created'] > 7200 || '' === $token['token'] || $force) {
+            $token['token'] = self::_requestAuthenticationToken();
+            $token['created'] = time();
+            file_put_contents(self::$tokenFile, serialize($token));
         }
 
+        self::$_token = $token;
         return self::$_token['token'];
     }
 
