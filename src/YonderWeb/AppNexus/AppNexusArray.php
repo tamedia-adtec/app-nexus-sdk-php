@@ -14,7 +14,7 @@ namespace YonderWeb\AppNexus;
  * @author Moiz Merchant <moiz@exactdrive.com>
  * @version $Id$
  */
-class AppNexusArray implements ArrayAccess, IteratorAggregate, Countable
+class AppNexusArray implements \ArrayAccess, \IteratorAggregate, \Countable
 {
 
     //-------------------------------------------------------------------------
