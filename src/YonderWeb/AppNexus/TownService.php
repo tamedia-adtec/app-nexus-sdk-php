@@ -1,4 +1,7 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
 // TownService.php
 //-----------------------------------------------------------------------------
@@ -10,7 +13,7 @@
  * @author Moiz Merchant <moiz@exactdrive.com>
  * @version $Id$
  */
-class AppNexus_TownService extends AppNexus_Api
+class TownService extends Api
 {
 
     //-------------------------------------------------------------------------
@@ -42,7 +45,7 @@ class AppNexus_TownService extends AppNexus_Api
      */
     public static function getBaseUrl()
     {
-        $url = AppNexus_Api::getBaseUrl() . '/town';
+        $url = Api::getBaseUrl() . '/town';
         return $url;
     }
 
@@ -63,10 +66,10 @@ class AppNexus_TownService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_ONLY);
+        return new Array($response, Object::MODE_READ_ONLY);
     }
 
     //-------------------------------------------------------------------------
@@ -85,10 +88,10 @@ class AppNexus_TownService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Object($response, AppNexus_Object::MODE_READ_ONLY);
+        return new Object($response, Object::MODE_READ_ONLY);
     }
 
     //-------------------------------------------------------------------------
@@ -110,10 +113,10 @@ class AppNexus_TownService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_ONLY);
+        return new Array($response, Object::MODE_READ_ONLY);
     }
 
     //-------------------------------------------------------------------------
@@ -135,10 +138,10 @@ class AppNexus_TownService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_ONLY);
+        return new Array($response, Object::MODE_READ_ONLY);
     }
 
     //-------------------------------------------------------------------------
@@ -160,10 +163,10 @@ class AppNexus_TownService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_ONLY);
+        return new Array($response, Object::MODE_READ_ONLY);
     }
 
     //-------------------------------------------------------------------------
@@ -185,10 +188,10 @@ class AppNexus_TownService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_ONLY);
+        return new Array($response, Object::MODE_READ_ONLY);
     }
 
     //-------------------------------------------------------------------------
@@ -210,10 +213,10 @@ class AppNexus_TownService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_ONLY);
+        return new Array($response, Object::MODE_READ_ONLY);
     }
 
 }

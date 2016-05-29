@@ -1,4 +1,7 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
 // Campaign.php
 //-----------------------------------------------------------------------------
@@ -6,20 +9,19 @@
 /**
  * AppNexus Campaign.
  *
- * @package AppNexus
  * @author Moiz Merchant <moiz@exactdrive.com>
+ *
  * @version $Id$
  */
-class AppNexus_Campaign
+class Campaign
 {
-
     //-------------------------------------------------------------------------
     // object
     //-------------------------------------------------------------------------
 
     public function __construct($campaignRow)
     {
-        $this->row                   = $campaignRow;
+        $this->row = $campaignRow;
         $this->_appNexusAdvertiserId = null;
     }
 
@@ -44,6 +46,7 @@ class AppNexus_Campaign
             $this->_appNexusAdvertiserId =
                 $this->row->fetchAdvertiser()->fetchUser()->appNexusAdvertiserID;
         }
+
         return $this->_appNexusAdvertiserId;
     }
 
@@ -57,11 +60,11 @@ class AppNexus_Campaign
     public function conversionPixel()
     {
         $pixelTable = new Campaigns_Model_DbTable_Pixels();
-        $pixels     = $pixelTable->fetchAllConversionPixels($this->row->id);
+        $pixels = $pixelTable->fetchAllConversionPixels($this->row->id);
         if (count($pixels) == 0) {
-            return null;
+            return;
         } else {
-            return new AppNexus_Pixel($pixels->current());
+            return new Pixel($pixels->current());
         }
     }
 
@@ -70,7 +73,8 @@ class AppNexus_Campaign
     /**
      * Retrives the retargetting pixels generated for this campaign.
      *
-     * @param  bool $deleted => retrieve deleted pixels
+     * @param bool $deleted => retrieve deleted pixels
+     *
      * @return hash
      */
     public function retargetingPixels($deleted = false)
@@ -79,10 +83,10 @@ class AppNexus_Campaign
         $pixels = $pixelTable->fetchAllRetargetingPixels(
             $this->row->id, $deleted);
         if (count($pixels) == 0) {
-            return null;
+            return;
         } else {
             return array_map(function ($pixel) {
-                return new AppNexus_Segment($pixel);
+                return new Segment($pixel);
             }, iterator_to_array($pixels));
         }
     }
@@ -106,12 +110,13 @@ class AppNexus_Campaign
     /**
      * Add conversion pixel to AppNexus.
      *
-     * @return AppNexus_Pixel
+     * @return Pixel
      */
     public function addConversionPixelToAppNexus()
     {
-        $pixel = AppNexus_Pixel::create($this->row->id, $this->row->toArray());
+        $pixel = Pixel::create($this->row->id, $this->row->toArray());
         $pixel->sync();
+
         return $pixel;
     }
 
@@ -120,7 +125,7 @@ class AppNexus_Campaign
     /**
      * Update conversion pixel in AppNexus.
      *
-     * @return AppNexus_Pixel
+     * @return Pixel
      */
     public function syncConversionPixelToAppNexus()
     {
@@ -148,6 +153,7 @@ class AppNexus_Campaign
     public function generateConversionPixelTag()
     {
         $pixel = $this->conversionPixel();
+
         return $pixel->generateTag();
     }
 
@@ -164,5 +170,4 @@ class AppNexus_Campaign
     {
         return $this->retargetingPixels($deleted) != null;
     }
-
 }

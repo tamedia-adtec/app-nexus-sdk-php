@@ -1,4 +1,7 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
 // ReportService.php
 //-----------------------------------------------------------------------------
@@ -6,20 +9,19 @@
 /**
  * AppNexus Report Api service.
  *
- * @package AppNexus
  * @author Moiz Merchant <moiz@exactdrive.com>
+ *
  * @version $Id$
  */
-class AppNexus_ReportService extends AppNexus_Api
+class ReportService extends Api
 {
-
     //-------------------------------------------------------------------------
     // static fields
     //-------------------------------------------------------------------------
 
     /**
      * Report properties which can be updated with AppNexus server.
-     *   https://wiki.appnexus.com/display/api/Report+Service#ReportService-RESTAPIforDataRetrieval
+     *   https://wiki.appnexus.com/display/api/Report+Service#ReportService-RESTAPIforDataRetrieval.
      *
      * @var array
      */
@@ -38,7 +40,7 @@ class AppNexus_ReportService extends AppNexus_Api
         'format',                 // format in which the report data will be returned
         'reporting_decimal_type', // decimal mark used in the report: 'comma', 'decimal'
         'emails',                 // list of email addresses to which the reporting data will be sent
-        'escape_fields'           // when true, it adds quotes around each field in the report output
+        'escape_fields',           // when true, it adds quotes around each field in the report output
     );
 
     //-------------------------------------------------------------------------
@@ -50,7 +52,8 @@ class AppNexus_ReportService extends AppNexus_Api
      */
     public static function getBaseUrl()
     {
-        $url = AppNexus_Api::getBaseUrl() . '/report';
+        $url = Api::getBaseUrl().'/report';
+
         return $url;
     }
 
@@ -61,7 +64,8 @@ class AppNexus_ReportService extends AppNexus_Api
      */
     public static function getDownloadUrl()
     {
-        $url = AppNexus_Api::getBaseUrl() . '/report-download';
+        $url = Api::getBaseUrl().'/report-download';
+
         return $url;
     }
 
@@ -70,25 +74,26 @@ class AppNexus_ReportService extends AppNexus_Api
     /**
      * Request a new report.
      *
-     * @param  int  $advertiserId => Advertiser id of report.
-     * @param  hash $report       => Only valid fields will be passed to api.
-     * @return int  $report_id    => Requested appnexus report id.
+     * @param int  $advertiserId => Advertiser id of report.
+     * @param hash $report       => Only valid fields will be passed to api.
+     *
+     * @return int $report_id    => Requested appnexus report id.
      */
     public static function requestReport($advertiserId, $report)
     {
         // construct url
-        $url = self::getBaseUrl() . '?' . http_build_query(array(
-            'advertiser_id' => $advertiserId
+        $url = self::getBaseUrl().'?'.http_build_query(array(
+            'advertiser_id' => $advertiserId,
         ));
 
         // package up the data, don't bother running query on invalid data
         $data = self::_createReportHash($report);
         if ($data == null) {
-            return null;
+            return;
         }
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::POST, $data);
+        $response = self::makeRequest($url, Api::POST, $data);
 
         return $response['report_id'];
     }
@@ -98,18 +103,19 @@ class AppNexus_ReportService extends AppNexus_Api
     /**
      * Request report information and status.
      *
-     * @param  int  $id       => Id of report.
+     * @param int $id => Id of report.
+     *
      * @return hash $response => Query response.
      */
     public static function getReport($id)
     {
         // construct url
-        $url = self::getBaseUrl() . '?' . http_build_query(array(
-            'id' => $id
+        $url = self::getBaseUrl().'?'.http_build_query(array(
+            'id' => $id,
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // [moiz] once we can encapsulate in a report object can save the
         //   execution status in there, for now just return the response so
@@ -122,18 +128,19 @@ class AppNexus_ReportService extends AppNexus_Api
     /**
      * Request report id of saved report.
      *
-     * @param  int  $id        => Id of saved report.
+     * @param int $id => Id of saved report.
+     *
      * @return hash $report_id => Id of report.
      */
     public static function getSavedReportId($id)
     {
         // construct url
-        $url = self::getBaseUrl() . '?' . http_build_query(array(
-            'saved_report_id' => $id
+        $url = self::getBaseUrl().'?'.http_build_query(array(
+            'saved_report_id' => $id,
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::POST);
+        $response = self::makeRequest($url, Api::POST);
 
         return $response['report_id'];
     }
@@ -143,18 +150,19 @@ class AppNexus_ReportService extends AppNexus_Api
     /**
      * Download a report.
      *
-     * @param  int  $id       => Id of report.
+     * @param int $id => Id of report.
+     *
      * @return hash $response => Query response.
      */
     public static function downloadReport($id)
     {
         // construct url
-        $url = self::getDownloadUrl() . '?' . http_build_query(array(
-            'id' => $id
+        $url = self::getDownloadUrl().'?'.http_build_query(array(
+            'id' => $id,
         ));
 
         // query app nexus server
-        $response = self::makeRequestRaw($url, AppNexus_Api::GET);
+        $response = self::makeRequestRaw($url, Api::GET);
 
         return $response;
     }
@@ -167,7 +175,8 @@ class AppNexus_ReportService extends AppNexus_Api
      * Returns an report hash containing only the fields which are allowed
      *  to be updated in the format accepted by AppNexus.
      *
-     * @param  hash $report
+     * @param hash $report
+     *
      * @return hash $report
      */
     private static function _createReportHash($report)
@@ -182,5 +191,4 @@ class AppNexus_ReportService extends AppNexus_Api
         // return null if no valid fields found
         return empty($pruned) ? null : array('report' => $pruned);
     }
-
 }

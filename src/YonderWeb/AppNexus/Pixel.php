@@ -1,4 +1,7 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
 // Pixel.php
 //-----------------------------------------------------------------------------
@@ -6,24 +9,23 @@
 /**
  * AppNexus Pixel.
  *
- * @package AppNexus
  * @author Moiz Merchant <moiz@exactdrive.com>
+ *
  * @version $Id$
  */
-class AppNexus_Pixel
+class Pixel
 {
-
     //-------------------------------------------------------------------------
     // constants
     //-------------------------------------------------------------------------
 
     const FLAG_DELETED = 0x1;
-    const FLAG_EMAIL   = 0x2;
-    const FLAG_SYNC    = 0x4;
+    const FLAG_EMAIL = 0x2;
+    const FLAG_SYNC = 0x4;
 
     const TYPE_HYBRID = 'hybrid';
-    const TYPE_VIEW   = 'view';
-    const TYPE_CLICK  = 'click';
+    const TYPE_VIEW = 'view';
+    const TYPE_CLICK = 'click';
 
     //-------------------------------------------------------------------------
     // fields
@@ -40,7 +42,7 @@ class AppNexus_Pixel
     protected $_data;
 
     /**
-     * @var AppNexus_Object
+     * @var object
      */
     protected $_appNexus;
 
@@ -56,18 +58,18 @@ class AppNexus_Pixel
     public static function getPixelType($viewCPA, $clickCPA)
     {
         // grab view/click cpa values
-        $hasViewCPA  = ($viewCPA != null) && ($viewCPA > 0.0);
+        $hasViewCPA = ($viewCPA != null) && ($viewCPA > 0.0);
         $hasClickCPA = ($clickCPA != null) && ($clickCPA > 0.0);
 
         // evaluate pixel type
         if ($hasViewCPA && $hasClickCPA) {
             return self::TYPE_HYBRID;
-        } else if ($hasViewCPA) {
+        } elseif ($hasViewCPA) {
             return self::TYPE_VIEW;
-        } else if ($hasClickCPA) {
+        } elseif ($hasClickCPA) {
             return self::TYPE_CLICK;
         } else {
-            return null;
+            return;
         }
     }
 
@@ -76,13 +78,14 @@ class AppNexus_Pixel
     /**
      * Add a new conversion pixel to AppNexus and the database.
      *
-     * @param  int  $campaignId
-     * @param  hash $data
-     * @return AppNexus_Pixel
+     * @param int  $campaignId
+     * @param hash $data
+     *
+     * @return Pixel
      */
     public static function create($campaignId, $data)
     {
-        $viewCPA  = $data['postViewCPA'];
+        $viewCPA = $data['postViewCPA'];
         $clickCPA = $data['postClickCPA'];
 
         // grab conversion type
@@ -95,14 +98,14 @@ class AppNexus_Pixel
         $pixelTable = new Campaigns_Model_DbTable_Pixels();
         $row = $pixelTable->createRow(array(
             'campaignId' => $campaignId,
-            'type'       => Campaigns_Model_DbTable_Pixels::TYPE_CONVERSION,
-            'name'       => $data['name'],
-            'data'       => json_encode(array('type' => $type)),
-            'flags'      => self::FLAG_SYNC
+            'type' => Campaigns_Model_DbTable_Pixels::TYPE_CONVERSION,
+            'name' => $data['name'],
+            'data' => json_encode(array('type' => $type)),
+            'flags' => self::FLAG_SYNC,
         ));
         $row->save();
 
-        return new AppNexus_Pixel($row);
+        return new self($row);
     }
 
     //-------------------------------------------------------------------------
@@ -111,8 +114,8 @@ class AppNexus_Pixel
 
     public function __construct($pixelRow)
     {
-        $this->row       = $pixelRow;
-        $this->_data     = null;
+        $this->row = $pixelRow;
+        $this->_data = null;
         $this->_appNexus = null;
     }
 
@@ -136,6 +139,7 @@ class AppNexus_Pixel
         if ($this->_data == null) {
             $this->_data = json_decode($this->row->data, true);
         }
+
         return $this->_data;
     }
 
@@ -152,9 +156,10 @@ class AppNexus_Pixel
             $data = json_decode($this->row->appNexusData, true);
             if ($data) {
                 $this->_appNexus =
-                    new AppNexus_Object($data, AppNexus_Object::MODE_READ_WRITE);
+                    new Object($data, Object::MODE_READ_WRITE);
             }
         }
+
         return $this->_appNexus;
     }
 
@@ -167,7 +172,7 @@ class AppNexus_Pixel
      */
     public function getCampaign()
     {
-        return new AppNexus_Campaign($this->row->fetchCampaign());
+        return new Campaign($this->row->fetchCampaign());
     }
 
     //-------------------------------------------------------------------------
@@ -181,7 +186,7 @@ class AppNexus_Pixel
      */
     public function shouldEmail()
     {
-        return AppNexus_Flags::isFlagSet($this->row->flags, self::FLAG_EMAIL);
+        return Flags::isFlagSet($this->row->flags, self::FLAG_EMAIL);
     }
 
     //-------------------------------------------------------------------------
@@ -193,7 +198,7 @@ class AppNexus_Pixel
      */
     public function shouldSync()
     {
-        return AppNexus_Flags::isFlagSet($this->row->flags, self::FLAG_SYNC);
+        return Flags::isFlagSet($this->row->flags, self::FLAG_SYNC);
     }
 
     //-------------------------------------------------------------------------
@@ -201,12 +206,13 @@ class AppNexus_Pixel
     /**
      * Sync pixel data with AppNexus.
      *
-     * @param  hash $data
-     * @return AppNexus_Pixel
+     * @param hash $data
+     *
+     * @return Pixel
      */
     public function update($data)
     {
-        $viewCPA  = $data['postViewCPA'];
+        $viewCPA = $data['postViewCPA'];
         $clickCPA = $data['postClickCPA'];
 
         // grab conversion type
@@ -232,11 +238,11 @@ class AppNexus_Pixel
     {
         // grab appnexus data
         $advertiserId = $this->row->fetchAppNexusAdvertiserId();
-        $syncData     = $this->_getSyncData();
+        $syncData = $this->_getSyncData();
 
         // create new segment
         if ($this->getAppNexusData() == null) {
-            $pixel = AppNexus_PixelService::addPixel($advertiserId, $syncData);
+            $pixel = PixelService::addPixel($advertiserId, $syncData);
 
             // pixel should be emailed after inital sync
             $this->row->flags |= self::FLAG_EMAIL;
@@ -244,7 +250,7 @@ class AppNexus_Pixel
         // update existing segment
         } else {
             $pixelId = $this->getAppNexusData()->id;
-            $pixel   = AppNexus_PixelService::updatePixel(
+            $pixel = PixelService::updatePixel(
                 $pixelId, $advertiserId, $syncData);
         }
 
@@ -266,6 +272,7 @@ class AppNexus_Pixel
     public function clearEmailFlag()
     {
         $this->_clearFlag(self::FLAG_EMAIL);
+
         return $this;
     }
 
@@ -279,6 +286,7 @@ class AppNexus_Pixel
     public function clearSyncFlag()
     {
         $this->_clearFlag(self::FLAG_SYNC);
+
         return $this;
     }
 
@@ -316,9 +324,9 @@ class AppNexus_Pixel
 
         // url depends on security option
         if ($secure) {
-            $url = "https://secure.adnxs.com";
+            $url = 'https://secure.adnxs.com';
         } else {
-            $url = "http://ads.exactdrive.com";
+            $url = 'http://ads.exactdrive.com';
         }
 
         // tag depends on type
@@ -332,9 +340,9 @@ class AppNexus_Pixel
 
         // generate tag
         $html =
-            "<!-- Conversion Pixel - {$this->row->name} - DO NOT MODIFY -->" . PHP_EOL .
-            $tag . PHP_EOL .
-            "<!-- End of Conversion Pixel -->";
+            "<!-- Conversion Pixel - {$this->row->name} - DO NOT MODIFY -->".PHP_EOL.
+            $tag.PHP_EOL.
+            '<!-- End of Conversion Pixel -->';
 
         return $html;
     }
@@ -347,8 +355,8 @@ class AppNexus_Pixel
     protected function _clearFlag($flag)
     {
         $flags = $this->row->flags;
-        if (AppNexus_Flags::isFlagSet($flags, $flag)) {
-            AppNexus_Flags::unsetFlag($flags, $flag);
+        if (Flags::isFlagSet($flags, $flag)) {
+            Flags::unsetFlag($flags, $flag);
             $this->row->flags = $flags;
             $this->row->save();
         }
@@ -372,12 +380,11 @@ class AppNexus_Pixel
 
         // construct sync hash
         $syncData = array(
-            'code'         => "pixels_{$this->row->id}",
-            'name'         => $this->row->name,
-            'trigger_type' => $data['type']
+            'code' => "pixels_{$this->row->id}",
+            'name' => $this->row->name,
+            'trigger_type' => $data['type'],
         );
 
         return $syncData;
     }
-
 }

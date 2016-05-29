@@ -1,4 +1,7 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
 // ProfileService.php
 //-----------------------------------------------------------------------------
@@ -10,7 +13,7 @@
  * @author Chris Mears <chris@exactdrive.com>
  * @version $Id$
  */
-class AppNexus_ProfileService extends AppNexus_Api
+class ProfileService extends Api
 {
 
     //-------------------------------------------------------------------------
@@ -121,7 +124,7 @@ class AppNexus_ProfileService extends AppNexus_Api
      */
     public static function getBaseUrl()
     {
-        $url = AppNexus_Api::getBaseUrl() . '/profile';
+        $url = Api::getBaseUrl() . '/profile';
         return $url;
     }
 
@@ -148,9 +151,9 @@ class AppNexus_ProfileService extends AppNexus_Api
         }
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::POST, $data);
+        $response = self::makeRequest($url, Api::POST, $data);
 
-        return new AppNexus_Object($response, AppNexus_Object::MODE_READ_WRITE);
+        return new Object($response, Object::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -178,9 +181,9 @@ class AppNexus_ProfileService extends AppNexus_Api
         }
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::PUT, $data);
+        $response = self::makeRequest($url, Api::PUT, $data);
 
-        return new AppNexus_Object($response, AppNexus_Object::MODE_READ_WRITE);
+        return new Object($response, Object::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -199,10 +202,10 @@ class AppNexus_ProfileService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_WRITE);
+        return new Array($response, Object::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -223,10 +226,10 @@ class AppNexus_ProfileService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Object($response, AppNexus_Object::MODE_READ_WRITE);
+        return new Object($response, Object::MODE_READ_WRITE);
     }
 
     /**
@@ -245,7 +248,7 @@ class AppNexus_ProfileService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::DELETE);
+        $response = self::makeRequest($url, Api::DELETE);
 
         return true;
     }

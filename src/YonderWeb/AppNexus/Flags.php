@@ -1,4 +1,7 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
 // Flags.php
 //-----------------------------------------------------------------------------
@@ -6,13 +9,12 @@
 /**
  * Flags class encapsulating bitwise operations.
  *
- * @package AppNexus
  * @author Moiz Merchant <moiz@exactdrive.com>
+ *
  * @version $Id$
  */
-class AppNexus_Flags
+class Flags
 {
-
     //-------------------------------------------------------------------------
     // static methods
     //-------------------------------------------------------------------------
@@ -71,7 +73,7 @@ class AppNexus_Flags
                 return true;
             }
         }
+
         return false;
     }
-
 }

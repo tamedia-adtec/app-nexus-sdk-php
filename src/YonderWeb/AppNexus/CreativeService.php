@@ -1,4 +1,7 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
 // CreativeService.php
 //-----------------------------------------------------------------------------
@@ -10,7 +13,7 @@
  * @author Moiz Merchant <moiz@exactdrive.com>
  * @version $Id$
  */
-class AppNexus_CreativeService extends AppNexus_Api
+class CreativeService extends Api
 {
 
     //-------------------------------------------------------------------------
@@ -95,7 +98,7 @@ class AppNexus_CreativeService extends AppNexus_Api
      */
     public static function getBaseUrl()
     {
-        $url = AppNexus_Api::getBaseUrl() . '/creative';
+        $url = Api::getBaseUrl() . '/creative';
         return $url;
     }
 
@@ -122,10 +125,10 @@ class AppNexus_CreativeService extends AppNexus_Api
         }
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::POST, $data);
+        $response = self::makeRequest($url, Api::POST, $data);
 
         // wrap response with app nexus object
-        return new AppNexus_Object($response, AppNexus_Object::MODE_READ_WRITE);
+        return new Object($response, Object::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -153,10 +156,10 @@ class AppNexus_CreativeService extends AppNexus_Api
         }
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::PUT, $data);
+        $response = self::makeRequest($url, Api::PUT, $data);
 
         // wrap response with app nexus object
-        return new AppNexus_Object($response, AppNexus_Object::MODE_READ_WRITE);
+        return new Object($response, Object::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -185,10 +188,10 @@ class AppNexus_CreativeService extends AppNexus_Api
         $url = self::getBaseUrl() . '?' . http_build_query($query);
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_WRITE);
+        return new Array($response, Object::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -207,7 +210,7 @@ class AppNexus_CreativeService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response to be an array if only single result queried
         if (count($ids) == 1) {
@@ -216,7 +219,7 @@ class AppNexus_CreativeService extends AppNexus_Api
         }
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_WRITE);
+        return new Array($response, Object::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -235,10 +238,10 @@ class AppNexus_CreativeService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Object($response, AppNexus_Object::MODE_READ_WRITE);
+        return new Object($response, Object::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -259,7 +262,7 @@ class AppNexus_CreativeService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::DELETE);
+        $response = self::makeRequest($url, Api::DELETE);
 
         return true;
     }

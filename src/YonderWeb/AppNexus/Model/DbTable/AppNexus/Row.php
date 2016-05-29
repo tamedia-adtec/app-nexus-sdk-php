@@ -6,13 +6,12 @@
 /**
  * AppNexus Row.
  *
- * @package AppNexus
  * @author Moiz Merchant <moiz@exactdrive.com>
+ *
  * @version $Id$
  */
-class AppNexus_Model_DbTable_AppNexus_Row extends Zend_Db_Table_Row
+class Model_DbTable_Row extends Zend_Db_Table_Row
 {
-
     //-------------------------------------------------------------------------
     // static methods
     //-------------------------------------------------------------------------
@@ -24,7 +23,8 @@ class AppNexus_Model_DbTable_AppNexus_Row extends Zend_Db_Table_Row
      */
     public static function isMoreThanTwoHoursOld($time)
     {
-        $twoHoursAgo = new DateTime("-2 hours");
+        $twoHoursAgo = new DateTime('-2 hours');
+
         return new DateTime($time) < $twoHoursAgo;
     }
 
@@ -39,9 +39,8 @@ class AppNexus_Model_DbTable_AppNexus_Row extends Zend_Db_Table_Row
      */
     public function saveToken($token)
     {
-        $this->token   = $token;
+        $this->token = $token;
         $this->created = date('Y-m-d H:i:s');
         $this->save();
     }
-
 }

@@ -1,4 +1,7 @@
 <?php
+
+namespace YonderWeb\AppNexus;
+
 //-----------------------------------------------------------------------------
 // CountryService.php
 //-----------------------------------------------------------------------------
@@ -10,7 +13,7 @@
  * @author Moiz Merchant <moiz@exactdrive.com>
  * @version $Id$
  */
-class AppNexus_CountryService extends AppNexus_Api
+class CountryService extends Api
 {
 
     //-------------------------------------------------------------------------
@@ -37,7 +40,7 @@ class AppNexus_CountryService extends AppNexus_Api
      */
     public static function getBaseUrl()
     {
-        $url = AppNexus_Api::getBaseUrl() . '/country';
+        $url = Api::getBaseUrl() . '/country';
         return $url;
     }
 
@@ -58,10 +61,10 @@ class AppNexus_CountryService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_ONLY);
+        return new Array($response, Object::MODE_READ_ONLY);
     }
 
     //-------------------------------------------------------------------------
@@ -80,10 +83,10 @@ class AppNexus_CountryService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Object($response, AppNexus_Object::MODE_READ_ONLY);
+        return new Object($response, Object::MODE_READ_ONLY);
     }
 
     //-------------------------------------------------------------------------
@@ -102,10 +105,10 @@ class AppNexus_CountryService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_ONLY);
+        return new Array($response, Object::MODE_READ_ONLY);
     }
 
     //-------------------------------------------------------------------------
@@ -124,10 +127,10 @@ class AppNexus_CountryService extends AppNexus_Api
         ));
 
         // query app nexus server
-        $response = self::makeRequest($url, AppNexus_Api::GET);
+        $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexus_Array($response, AppNexus_Object::MODE_READ_ONLY);
+        return new Array($response, Object::MODE_READ_ONLY);
     }
 
 }

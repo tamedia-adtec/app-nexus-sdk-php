@@ -6,13 +6,12 @@
 /**
  * AppNexus model holding token and expiry information.
  *
- * @package AppNexus
  * @author Moiz Merchant <moiz@exactdrive.com>
+ *
  * @version $Id$
  */
-class AppNexus_Model_DbTable_AppNexus extends Zend_Db_Table_Abstract
+class Model_DbTable_AppNexus extends Zend_Db_Table_Abstract
 {
-
     //-------------------------------------------------------------------------
     // fields
     //-------------------------------------------------------------------------
@@ -25,7 +24,7 @@ class AppNexus_Model_DbTable_AppNexus extends Zend_Db_Table_Abstract
     /**
      * @var string
      */
-    protected $_rowClass = 'AppNexus_Model_DbTable_AppNexus_Row';
+    protected $_rowClass = 'Model_DbTable_Row';
 
     /**
      * Primary Key column(s).
@@ -40,5 +39,4 @@ class AppNexus_Model_DbTable_AppNexus extends Zend_Db_Table_Abstract
      * @var string
      */
     protected $_sequence = true;
-
 }
