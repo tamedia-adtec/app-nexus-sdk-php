@@ -82,7 +82,7 @@ class PixelService extends Api
         $response = self::makeRequest($url, Api::POST, $data);
 
         // wrap response with app nexus object
-        return new Object($response, Object::MODE_READ_WRITE);
+        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -113,7 +113,7 @@ class PixelService extends Api
         $response = self::makeRequest($url, Api::PUT, $data);
 
         // wrap response with app nexus object
-        return new Object($response, Object::MODE_READ_WRITE);
+        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -144,7 +144,7 @@ class PixelService extends Api
         $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexusArray($response, Object::MODE_READ_WRITE);
+        return new AppNexusArray($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -172,7 +172,7 @@ class PixelService extends Api
         }
 
         // wrap response with app nexus object
-        return new AppNexusArray($response, Object::MODE_READ_WRITE);
+        return new AppNexusArray($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -194,7 +194,7 @@ class PixelService extends Api
         $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new Object($response, Object::MODE_READ_WRITE);
+        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------

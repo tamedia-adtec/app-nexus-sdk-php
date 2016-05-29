@@ -69,7 +69,7 @@ class DomainListService extends Api
          // query app nexus server
          $response = self::makeRequest($url, Api::POST, $data);
 
-         return new Object($response, Object::MODE_READ_WRITE);
+         return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
      }
 
      /**
@@ -96,7 +96,7 @@ class DomainListService extends Api
          // query app nexus server
          $response = self::makeRequest($url, Api::PUT, $data);
 
-         return new Object($response, Object::MODE_READ_WRITE);
+         return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
      }
 
      //-------------------------------------------------------------------------

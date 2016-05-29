@@ -61,7 +61,7 @@ class AppNexusArray implements ArrayAccess, IteratorAggregate, Countable
         // set the raw data
         $this->_array = array();
         foreach ($response[$key] as $element) {
-            array_push($this->_array, new Object($element, $mode));
+            array_push($this->_array, new AppNexusObject($element, $mode));
         }
 
         // update management variables

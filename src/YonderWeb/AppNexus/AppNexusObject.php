@@ -3,7 +3,7 @@
 namespace YonderWeb\AppNexus;
 
 //-----------------------------------------------------------------------------
-// Object.php
+// AppNexusObject.php
 //-----------------------------------------------------------------------------
 
 /**
@@ -14,7 +14,7 @@ namespace YonderWeb\AppNexus;
  *
  * @version $Id$
  */
-class Object
+class AppNexusObject
 {
     //-------------------------------------------------------------------------
     // constants

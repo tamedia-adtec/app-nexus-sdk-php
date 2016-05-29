@@ -75,7 +75,7 @@ class AdvertiserService extends Api
         // query app nexus server
         $response = self::makeRequest($url, Api::POST, $data);
 
-        return new Object($response, Object::MODE_READ_WRITE);
+        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -103,7 +103,7 @@ class AdvertiserService extends Api
         // query app nexus server
         $response = self::makeRequest($url, Api::PUT, $data);
 
-        return new Object($response, Object::MODE_READ_WRITE);
+        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -126,7 +126,7 @@ class AdvertiserService extends Api
         $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexusArray($response, Object::MODE_READ_WRITE);
+        return new AppNexusArray($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -155,7 +155,7 @@ class AdvertiserService extends Api
         $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexusArray($response, Object::MODE_READ_WRITE);
+        return new AppNexusArray($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -177,7 +177,7 @@ class AdvertiserService extends Api
         $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new Object($response, Object::MODE_READ_WRITE);
+        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -203,7 +203,7 @@ class AdvertiserService extends Api
         $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexusArray($response, Object::MODE_READ_WRITE);
+        return new AppNexusArray($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
@@ -249,7 +249,7 @@ class AdvertiserService extends Api
         $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new Object($response, Object::MODE_READ_WRITE);
+        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------

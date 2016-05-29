@@ -66,7 +66,7 @@ class RegionService extends Api
         $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexusArray($response, Object::MODE_READ_ONLY);
+        return new AppNexusArray($response, AppNexusObject::MODE_READ_ONLY);
     }
 
     //-------------------------------------------------------------------------
@@ -88,7 +88,7 @@ class RegionService extends Api
         $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new Object($response, Object::MODE_READ_ONLY);
+        return new AppNexusObject($response, AppNexusObject::MODE_READ_ONLY);
     }
 
     //-------------------------------------------------------------------------
@@ -113,7 +113,7 @@ class RegionService extends Api
         $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexusArray($response, Object::MODE_READ_ONLY);
+        return new AppNexusArray($response, AppNexusObject::MODE_READ_ONLY);
     }
 
     //-------------------------------------------------------------------------
@@ -138,7 +138,7 @@ class RegionService extends Api
         $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexusArray($response, Object::MODE_READ_ONLY);
+        return new AppNexusArray($response, AppNexusObject::MODE_READ_ONLY);
     }
 
     //-------------------------------------------------------------------------
@@ -163,7 +163,7 @@ class RegionService extends Api
         $response = self::makeRequest($url, Api::GET);
 
         // wrap response with app nexus object
-        return new AppNexusArray($response, Object::MODE_READ_ONLY);
+        return new AppNexusArray($response, AppNexusObject::MODE_READ_ONLY);
     }
 
 }

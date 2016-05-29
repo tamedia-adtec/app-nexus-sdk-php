@@ -31,7 +31,7 @@ class ContentCategoryService extends Api
         'name',             // String
         'description',      // String
         'is_system',        // READ ONLY. Boolean
-        'parent_category',  // Object (see docs)
+        'parent_category',  // AppNexusObject (see docs)
         'type',             // Enum('standard')
         'last_modified',    // READ ONLY. timestamp
         'category_type'
@@ -71,7 +71,7 @@ class ContentCategoryService extends Api
          $response = self::makeRequest($url, Api::GET);
 
          // wrap response with app nexus object
-         return new AppNexusArray($response, Object::MODE_READ_ONLY);
+         return new AppNexusArray($response, AppNexusObject::MODE_READ_ONLY);
      }
 
 }

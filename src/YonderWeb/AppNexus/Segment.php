@@ -131,7 +131,7 @@ class Segment
             $data = json_decode($this->row->appNexusData, true);
             if ($data) {
                 $this->_appNexus =
-                    new Object($data, Object::MODE_READ_WRITE);
+                    new AppNexusObject($data, AppNexusObject::MODE_READ_WRITE);
             }
         }
 

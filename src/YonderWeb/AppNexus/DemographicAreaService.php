@@ -63,7 +63,7 @@ class DemographicAreaService extends Api
          $response = self::makeRequest($url, Api::GET);
 
          // wrap response with app nexus object
-         return new AppNexusArray($response, Object::MODE_READ_ONLY);
+         return new AppNexusArray($response, AppNexusObject::MODE_READ_ONLY);
      }
 
 }
