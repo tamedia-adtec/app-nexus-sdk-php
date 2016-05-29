@@ -100,8 +100,18 @@ class Api
      */
     private static $_token;
 
+    /**
+     * AppNexus Api authentication token file name
+     *
+     * @var string
+     */
     private static $tokenFile;
 
+    /**
+     * Data directory
+     *
+     * @var string
+     */
     private static $_dataDirectory;
 
     //-------------------------------------------------------------------------
@@ -263,13 +273,16 @@ class Api
         return self::$tokenFile;
     }
 
-    private static function getFileSystem() {
+    /**
+     * Get file system
+     *
+     * @return Filesystem
+     */
+    private static function getFileSystem()
+    {
         $adapter = new Local(self::getDataDirectory());
         return new Filesystem($adapter);
     }
-    //-------------------------------------------------------------------------
-    // static methods
-    //-------------------------------------------------------------------------
 
     /**
      * Make curl request to AppNexus Api, raw result will be returned with no
@@ -379,7 +392,7 @@ class Api
             $errorMsg = 'Invalid AppNexus response.';
             BookingEngine_Debug::printr($errorMsg, false);
             BookingEngine_Debug::printr($json);
-            Monolog::addInfo($errroMsg);
+            Monolog::addInfo($errorMsg);
             throw new \Exception($errorMsg);
         }
 
@@ -500,8 +513,7 @@ class Api
      *
      * @return hash $result
      */
-    private static function _makeRequest($token, $url,
-        $type = self::GET, $data = null)
+    private static function _makeRequest($token, $url, $type = self::GET, $data = null)
     {
         // set default curl options
         $curlOptions = array(
