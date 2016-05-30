@@ -274,6 +274,21 @@ class Api
     }
 
     /**
+     * Decode AppNexus Api Message.
+     *
+     * @param  string $message Serialized message
+     *
+     * @return object          Decoded message
+     */
+    public static function decodeMessage($message)
+    {
+        $message = unserialize($message);
+        $decodedMessage = json_decode($message['response'][0]);
+
+        return $decodedMessage;
+    }
+
+    /**
      * Get file system
      *
      * @return Filesystem
