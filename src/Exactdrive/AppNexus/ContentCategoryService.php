@@ -1,19 +1,19 @@
 <?php
 
-namespace YonderWeb\AppNexus;
+namespace Exactdrive\AppNexus;
 
 //-----------------------------------------------------------------------------
-// DemographicAreaService.php
+// ContentCategoryService.php
 //-----------------------------------------------------------------------------
 
 /**
- * AppNexus Demographic Area Api service.
+ * AppNexus Content Category Api service.
  *
  * @package AppNexus
  * @author Chris Mears <chris@exactdrive.com>
  * @version $Id$
  */
-class DemographicAreaService extends Api
+class ContentCategoryService extends Api
 {
 
     //-------------------------------------------------------------------------
@@ -21,14 +21,20 @@ class DemographicAreaService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * Demographic Area properties.
-     * https://wiki.appnexus.com/display/api/Demographic+Area+Service#DemographicAreaService-JSONFields
+     * Content Category properties.
+     *   https://wiki.appnexus.com/display/api/Content+Category+Service#ContentCategoryService-JSONFields
      *
      * @var array
      */
     public static $fields = array(
         'id',               // Integer
-        'name'              // String
+        'name',             // String
+        'description',      // String
+        'is_system',        // READ ONLY. Boolean
+        'parent_category',  // AppNexusObject (see docs)
+        'type',             // Enum('standard')
+        'last_modified',    // READ ONLY. timestamp
+        'category_type'
     );
 
     //-------------------------------------------------------------------------
@@ -40,7 +46,7 @@ class DemographicAreaService extends Api
      */
     public static function getBaseUrl()
     {
-        $url = Api::getBaseUrl() . '/dma';
+        $url = Api::getBaseUrl() . '/content-category';
         return $url;
     }
 
@@ -51,10 +57,12 @@ class DemographicAreaService extends Api
      *
      * @return array $countries
      */
-     public static function getAll($start_element = 0, $num_elements = 100)
+     public static function getAllUniversalCategories(
+         $start_element = 0, $num_elements = 100)
      {
          // construct url
          $url = self::getBaseUrl() . '?' . http_build_query(array(
+             'category_type' => 'universal',
              'start_element' => $start_element,
              'num_elements'  => $num_elements
          ));

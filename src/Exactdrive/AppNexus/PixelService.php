@@ -1,13 +1,13 @@
 <?php
 
-namespace YonderWeb\AppNexus;
+namespace Exactdrive\AppNexus;
 
 //-----------------------------------------------------------------------------
 // PixelService.php
 //-----------------------------------------------------------------------------
 
 
-namespace YonderWeb\AppNexus;
+namespace Exactdrive\AppNexus;
 
 /**
  * AppNexus Pixel Api service.

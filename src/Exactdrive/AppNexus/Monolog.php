@@ -1,6 +1,6 @@
 <?php
 
-namespace YonderWeb\AppNexus;
+namespace Exactdrive\AppNexus;
 
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;

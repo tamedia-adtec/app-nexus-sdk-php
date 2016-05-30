@@ -1,6 +1,6 @@
 <?php
 
-namespace YonderWeb\AppNexus;
+namespace Exactdrive\AppNexus;
 
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;

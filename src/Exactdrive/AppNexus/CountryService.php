@@ -1,19 +1,19 @@
 <?php
 
-namespace YonderWeb\AppNexus;
+namespace Exactdrive\AppNexus;
 
 //-----------------------------------------------------------------------------
-// RegionService.php
+// CountryService.php
 //-----------------------------------------------------------------------------
 
 /**
- * AppNexus Region Api service.
+ * AppNexus Country Api service.
  *
  * @package AppNexus
  * @author Moiz Merchant <moiz@exactdrive.com>
  * @version $Id$
  */
-class RegionService extends Api
+class CountryService extends Api
 {
 
     //-------------------------------------------------------------------------
@@ -21,16 +21,14 @@ class RegionService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * Region properties.
-     *   https://wiki.appnexus.com/display/api/Region+Service#RegionService-JSONFields
+     * Country properties.
+     *   https://wiki.appnexus.com/display/api/Country+Service#CountryService-JSONFields
      *
      * @var array
      */
     public static $fields = array(
-        'name',         // name of region
-        'code',         // ISO code of the region
-        'country_code', // ISO code for the country to which the region belongs
-        'country_name'  // name of the country to which the region belongs
+        'name', // name of country
+        'code'  // ISO code of the country
     );
 
     //-------------------------------------------------------------------------
@@ -38,22 +36,22 @@ class RegionService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * App Nexus region service url.
+     * App Nexus country service url.
      */
     public static function getBaseUrl()
     {
-        $url = Api::getBaseUrl() . '/region';
+        $url = Api::getBaseUrl() . '/country';
         return $url;
     }
 
     //-------------------------------------------------------------------------
 
     /**
-     * View all regions, results are paged.
+     * View all countries, results are paged.
      *
-     * @return array $regions
+     * @return array $countries
      */
-    public static function getAllRegions(
+    public static function getAllCountries(
         $start_element = 0, $num_elements = 100)
     {
         // construct url
@@ -72,12 +70,12 @@ class RegionService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * View a specific region.
+     * View a specific country.
      *
      * @param  int  $id
-     * @return hash $region
+     * @return hash $country
      */
-    public static function getRegion($id)
+    public static function getCountry($id)
     {
         // construct url
         $url = self::getBaseUrl() . '?' . http_build_query(array(
@@ -94,19 +92,16 @@ class RegionService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * View specific regions, results are paged.
+     * View specific countries.
      *
      * @param  array $names
-     * @return array $regions
+     * @return array $countries
      */
-    public static function getRegionsByName($names,
-        $start_element = 0, $num_elements = 100)
+    public static function getCountriesByName($names)
     {
         // construct url
         $url = self::getBaseUrl() . '?' . http_build_query(array(
-            'name'          => implode(',', $names),
-            'start_element' => $start_element,
-            'num_elements'  => $num_elements
+            'name' => implode(',', $names)
         ));
 
         // query app nexus server
@@ -119,44 +114,16 @@ class RegionService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * View specific regions, results are paged.
+     * View specific countries.
      *
      * @param  array $codes
-     * @return array $regions
+     * @return array $countries
      */
-    public static function getRegionsByCode($codes,
-        $start_element = 0, $num_elements = 100)
+    public static function getCountriesByCode($codes)
     {
         // construct url
         $url = self::getBaseUrl() . '?' . http_build_query(array(
-            'code'          => implode(',', $codes),
-            'start_element' => $start_element,
-            'num_elements'  => $num_elements
-        ));
-
-        // query app nexus server
-        $response = self::makeRequest($url, Api::GET);
-
-        // wrap response with app nexus object
-        return new AppNexusArray($response, AppNexusObject::MODE_READ_ONLY);
-    }
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * View specific regions, results are paged.
-     *
-     * @param  array $codes
-     * @return array $regions
-     */
-    public static function getRegionsByCountryCode($codes,
-        $start_element = 0, $num_elements = 100)
-    {
-        // construct url
-        $url = self::getBaseUrl() . '?' . http_build_query(array(
-            'country_code'  => implode(',', $codes),
-            'start_element' => $start_element,
-            'num_elements'  => $num_elements
+            'code' => implode(',', $codes)
         ));
 
         // query app nexus server

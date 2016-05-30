@@ -1,19 +1,19 @@
 <?php
 
-namespace YonderWeb\AppNexus;
+namespace Exactdrive\AppNexus;
 
 //-----------------------------------------------------------------------------
-// AdvertiserService.php
+// SegmentService.php
 //-----------------------------------------------------------------------------
 
 /**
- * AppNexus Advertiser Api service.
+ * AppNexus Segment Api service.
  *
  * @package AppNexus
  * @author Moiz Merchant <moiz@exactdrive.com>
  * @version $Id$
  */
-class AdvertiserService extends Api
+class SegmentService extends Api
 {
 
     //-------------------------------------------------------------------------
@@ -21,23 +21,26 @@ class AdvertiserService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * Advertiser properties which can be updated with AppNexus server.
-     *   https://wiki.appnexus.com/pages/viewpage.action?title=Advertiser+Service&spaceKey=api#AdvertiserService-JSONFields
+     * Segment properties which can be updated with AppNexus server.
+     *   https://wiki.appnexus.com/pages/viewpage.action?title=Segment+Service&spaceKey=api#SegmentService-JSONFields
      *
      * @var array
      */
     public static $fields = array(
-        'code',             // custom code for the advertiser
-        'name',             // name of advertiser
-        'state',            // 'active' / 'inactive'
-        'billing_name',     // for reference
-        'billing_phone',    // for reference
-        'billing_address1', // for reference
-        'billing_address2', // for reference
-        'billing_city',     // for reference
-        'billing_state',    // for reference
-        'billing_country',  // for reference
-        'billing_zip'       // for reference
+        'code',                // custom code for the segment
+        'state',               // 'active' / 'inactive'
+        'short_name',          // short name used to describe the segment
+        'description',         // optional description for this segment
+        'member_id',           // id of the member that owns this segment
+        'category',            //
+        'price',               // flat cpm price of the segment
+        'expire_minutes',      // expiration time for the segment
+        'enable_rm_piggyback', // true, piggybacking RM pixels is enabled
+        'max_usersync_pixels', // maximum number of third-party user sync pixels to piggyback onto the segment pixel
+        'advertiser_id',       // id of the advertiser using the segment if the segment should be on the ddvertiser level rather than the Network level
+        'piggyback_pixels',    // urls of the pixels you want us to fire when the segment pixel fires
+        'parent_segment_id',   // id of the parent segment
+        'querystring_mapping'  //
     );
 
     //-------------------------------------------------------------------------
@@ -45,29 +48,38 @@ class AdvertiserService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * AppNexus advertiser service url.
+     * AppNexus segment service url.
      */
     public static function getBaseUrl()
     {
-        $url = Api::getBaseUrl() . '/advertiser';
+        $url = Api::getBaseUrl() . '/segment';
         return $url;
     }
 
     //-------------------------------------------------------------------------
 
     /**
-     * Add a new advertiser.
+     * Add a new segment.
      *
-     * @param  hash $advertiser => Only valid fields will be passed to api.
-     * @return hash $advertiser => Newly created appnexus advertiser id.
+     * @param  hash $segment      => Only valid fields will be passed to api.
+     * @param  int  $advertiserId => Advertiser id of segment.
+     * @return hash $segment      => Newly created appnexus segment.
      */
-    public static function addAdvertiser($advertiser)
+    public static function addSegment($segment, $advertiserId = null)
     {
+        // construct query
+        $query = array();
+
+        // add advertiser filter if requested
+        if ($advertiserId != null) {
+            $query['advertiser_id'] = $advertiserId;
+        }
+
         // construct url
-        $url = self::getBaseUrl();
+        $url = self::getBaseUrl() . '?' . http_build_query($query);
 
         // package up the data, don't bother running query on invalid data
-        $data = self::_createAdvertiserHash($advertiser);
+        $data = self::_createSegmentHash($segment);
         if ($data == null) {
             return null;
         }
@@ -75,27 +87,37 @@ class AdvertiserService extends Api
         // query app nexus server
         $response = self::makeRequest($url, Api::POST, $data);
 
+        // wrap response with app nexus object
         return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
 
     /**
-     * Update an existing advertiser.
+     * Update an existing segment.
      *
-     * @param  int  $id         => Id of advertiser.
-     * @param  hash $advertiser => Only valid fields will be passed to api.
-     * @return hash $advertiser => Updated appnexus advertiser.
+     * @param  int  $id           => Id of segment.
+     * @param  int  $advertiserId => Id of the associated advertiser.
+     * @param  hash $segment      => Only valid fields will be passed to api.
+     * @return hash $segment      => Updated appnexus segment.
      */
-    public static function updateAdvertiser($id, $advertiser)
+    public static function updateSegment($id, $segment, $advertiserId = null)
     {
-        // construct url
-        $url = self::getBaseUrl() . '?' . http_build_query(array(
+        // construct query
+        $query = array(
             'id' => $id
-        ));
+        );
+
+        // add advertiser filter if requested
+        if ($advertiserId != null) {
+            $query['advertiser_id'] = $advertiserId;
+        }
+
+        // construct url
+        $url = self::getBaseUrl() . '?' . http_build_query($query);
 
         // package up the data, don't bother running query on invalid data
-        $data = self::_createAdvertiserHash($advertiser);
+        $data = self::_createSegmentHash($segment);
         if ($data == null) {
             return null;
         }
@@ -103,24 +125,34 @@ class AdvertiserService extends Api
         // query app nexus server
         $response = self::makeRequest($url, Api::PUT, $data);
 
+        // wrap response with app nexus object
         return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
 
     //-------------------------------------------------------------------------
 
     /**
-     * View all advertisers, results are paged.
+     * View all segments, can filter by advertiser, results are paged.
      *
-     * @return array $advertisers
+     * @param  int   $advertiserId
+     * @return array $segments
      */
-    public static function getAllAdvertisers(
+    public static function getAllSegments($advertiserId = null,
         $start_element = 0, $num_elements = 100)
     {
-        // construct url
-        $url = self::getBaseUrl() . '?' . http_build_query(array(
+        // construct query
+        $query = array(
             'start_element' => $start_element,
             'num_elements'  => $num_elements
-        ));
+        );
+
+        // add advertiser filter if requested
+        if ($advertiserId != null) {
+            $query['advertiser_id'] = $advertiserId;
+        }
+
+        // construct url
+        $url = self::getBaseUrl() . '?' . http_build_query($query);
 
         // query app nexus server
         $response = self::makeRequest($url, Api::GET);
@@ -132,20 +164,13 @@ class AdvertiserService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * View advertisers speficied by ids, results are paged.
+     * View segments speficied by ids, results are paged.
      *
      * @param  array(int) $ids
-     * @return array      $advertisers
+     * @return array      $segments
      */
-    public static function getAdvertisers($ids)
+    public static function getSegments($ids)
     {
-        // [moiz] need to fix this...
-
-        // shortcut if only single id is specified
-        if (count($ids) == 1) {
-            return array(self::getAdvertiser($ids[0]));
-        }
-
         // construct url
         $url = self::getBaseUrl() . '?' . http_build_query(array(
             'id' => implode(',', $ids)
@@ -154,6 +179,12 @@ class AdvertiserService extends Api
         // query app nexus server
         $response = self::makeRequest($url, Api::GET);
 
+        // wrap response to be an array if only single result queried
+        if (count($ids) == 1) {
+            $key            = $response['dbg_info']['output_term'];
+            $response[$key] = array($response[$key]);
+        }
+
         // wrap response with app nexus object
         return new AppNexusArray($response, AppNexusObject::MODE_READ_WRITE);
     }
@@ -161,12 +192,12 @@ class AdvertiserService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * View a specific advertiser.
+     * View a specific segment.
      *
      * @param  int  $id
-     * @return hash $advertiser
+     * @return hash $segment
      */
-    public static function getAdvertiser($id)
+    public static function getSegment($id)
     {
         // construct url
         $url = self::getBaseUrl() . '?' . http_build_query(array(
@@ -183,13 +214,13 @@ class AdvertiserService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * Search for advertisers with ids or names containing certain characters,
+     * Search for segments with ids or names containing certain characters,
      *  results are paged.
      *
      * @param  string $term
-     * @return array  $advertisers
+     * @return array  $segments
      */
-    public static function searchAdvertisers($term,
+    public static function searchSegments($term,
         $start_element = 0, $num_elements = 100)
     {
         // construct url
@@ -209,12 +240,12 @@ class AdvertiserService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * Delete an advertiser.
+     * Delete a segment.
      *
-     * @param  int  $id
+     * @param  int  $id     => Id of segment.
      * @return bool $status
      */
-    public static function deleteAdvertiser($id)
+    public static function deleteSegment($id)
     {
         // construct url
         $url = self::getBaseUrl() . '?' . http_build_query(array(
@@ -228,52 +259,27 @@ class AdvertiserService extends Api
     }
 
     //-------------------------------------------------------------------------
-
-    /**
-     * Retrive quick statistics about an advertiser.
-     *
-     * @param  int    $id
-     * @param  string $interval
-     * @return hash   $advertiser
-     */
-    public static function getQuickStats($id, $interval = '7day')
-    {
-        // construct url
-        $url = self::getBaseUrl() . '?' . http_build_query(array(
-            'id'       => $id,
-            'stats'    => 'true',
-            'interval' => $interval
-        ));
-
-        // query app nexus server
-        $response = self::makeRequest($url, Api::GET);
-
-        // wrap response with app nexus object
-        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
-    }
-
-    //-------------------------------------------------------------------------
     // internal methods
     //-------------------------------------------------------------------------
 
     /**
-     * Returns an advertiser hash containing only the fields which are allowed
+     * Returns a segment hash containing only the fields which are allowed
      *  to be updated in the format accepted by AppNexus.
      *
-     * @param  hash $advertiser
-     * @return hash $advertiser
+     * @param  hash $segment
+     * @return hash $segment
      */
-    private static function _createAdvertiserHash($advertiser)
+    private static function _createSegmentHash($segment)
     {
         $pruned = array();
         foreach (self::$fields as $key) {
-            if (array_key_exists($key, $advertiser)) {
-                $pruned[$key] = $advertiser[$key];
+            if (array_key_exists($key, $segment)) {
+                $pruned[$key] = $segment[$key];
             }
         }
 
         // return null if no valid fields found
-        return empty($pruned) ? null : array('advertiser' => $pruned);
+        return empty($pruned) ? null : array('segment' => $pruned);
     }
 
 }

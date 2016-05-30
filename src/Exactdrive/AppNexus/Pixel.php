@@ -1,19 +1,19 @@
 <?php
 
-namespace YonderWeb\AppNexus;
+namespace Exactdrive\AppNexus;
 
 //-----------------------------------------------------------------------------
-// Segment.php
+// Pixel.php
 //-----------------------------------------------------------------------------
 
 /**
- * AppNexus Segment.
+ * AppNexus Pixel.
  *
  * @author Moiz Merchant <moiz@exactdrive.com>
  *
  * @version $Id$
  */
-class Segment
+class Pixel
 {
     //-------------------------------------------------------------------------
     // constants
@@ -23,18 +23,9 @@ class Segment
     const FLAG_EMAIL = 0x2;
     const FLAG_SYNC = 0x4;
 
-    //-------------------------------------------------------------------------
-    // static fields
-    //-------------------------------------------------------------------------
-
-    /**
-     * @var hash
-     */
-    public static $expiryUnits = array(
-        'minute' => 'Minutes',
-        'hour' => 'Hours',
-        'day' => 'Days',
-    );
+    const TYPE_HYBRID = 'hybrid';
+    const TYPE_VIEW = 'view';
+    const TYPE_CLICK = 'click';
 
     //-------------------------------------------------------------------------
     // fields
@@ -60,22 +51,56 @@ class Segment
     //-------------------------------------------------------------------------
 
     /**
-     * Add a new retargeting pixel to the database.
+     * Get the type of conversion pixel.
+     *
+     * @return string => null is returned if neither type found.
+     */
+    public static function getPixelType($viewCPA, $clickCPA)
+    {
+        // grab view/click cpa values
+        $hasViewCPA = ($viewCPA != null) && ($viewCPA > 0.0);
+        $hasClickCPA = ($clickCPA != null) && ($clickCPA > 0.0);
+
+        // evaluate pixel type
+        if ($hasViewCPA && $hasClickCPA) {
+            return self::TYPE_HYBRID;
+        } elseif ($hasViewCPA) {
+            return self::TYPE_VIEW;
+        } elseif ($hasClickCPA) {
+            return self::TYPE_CLICK;
+        } else {
+            return;
+        }
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Add a new conversion pixel to AppNexus and the database.
      *
      * @param int  $campaignId
      * @param hash $data
      *
-     * @return Segment
+     * @return Pixel
      */
     public static function create($campaignId, $data)
     {
+        $viewCPA = $data['postViewCPA'];
+        $clickCPA = $data['postClickCPA'];
+
+        // grab conversion type
+        $type = self::getPixelType($viewCPA, $clickCPA);
+        if ($type == null) {
+            throw new Exception("Invalid conversion pixel type: $type.");
+        }
+
         // save to database
         $pixelTable = new Campaigns_Model_DbTable_Pixels();
         $row = $pixelTable->createRow(array(
             'campaignId' => $campaignId,
-            'type' => Campaigns_Model_DbTable_Pixels::TYPE_RETARGETING,
+            'type' => Campaigns_Model_DbTable_Pixels::TYPE_CONVERSION,
             'name' => $data['name'],
-            'data' => json_encode($data),
+            'data' => json_encode(array('type' => $type)),
             'flags' => self::FLAG_SYNC,
         ));
         $row->save();
@@ -87,9 +112,9 @@ class Segment
     // object
     //-------------------------------------------------------------------------
 
-    public function __construct($segmentRow)
+    public function __construct($pixelRow)
     {
-        $this->row = $segmentRow;
+        $this->row = $pixelRow;
         $this->_data = null;
         $this->_appNexus = null;
     }
@@ -105,7 +130,7 @@ class Segment
     //-------------------------------------------------------------------------
 
     /**
-     * Retrives the retargeting pixel data.
+     * Retrives the conversion pixel data.
      *
      * @return int
      */
@@ -121,7 +146,7 @@ class Segment
     //-------------------------------------------------------------------------
 
     /**
-     * Retrives the AppNexus segment data.
+     * Retrives the AppNexus pixel data.
      *
      * @return int
      */
@@ -155,18 +180,6 @@ class Segment
     //-------------------------------------------------------------------------
 
     /**
-     * Returns true if pixel is marked as deleted.
-     *
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        return Flags::isFlagSet($this->row->flags, self::FLAG_DELETED);
-    }
-
-    //-------------------------------------------------------------------------
-
-    /**
      * Returns true if pixel requires email to user.
      *
      * @return bool
@@ -191,41 +204,27 @@ class Segment
     //-------------------------------------------------------------------------
 
     /**
-     * Update retargeting pixel data in database.
+     * Sync pixel data with AppNexus.
      *
      * @param hash $data
      *
-     * @return this
+     * @return Pixel
      */
     public function update($data)
     {
-        $current = $this->getData();
-        $flags = 0x0;
+        $viewCPA = $data['postViewCPA'];
+        $clickCPA = $data['postClickCPA'];
 
-        // keys triggering sync
-        $syncKeys = array(
-            'name',
-            'expiryType',
-            'expiryAmount',
-            'expiryUnit',
-        );
-
-        // check if changes require sync
-        foreach ($syncKeys as $key) {
-            if ($current[$key] != $data[$key]) {
-                Flags::setFlag($flags, self::FLAG_SYNC);
-                break;
-            }
+        // grab conversion type
+        $type = self::getPixelType($viewCPA, $clickCPA);
+        if ($type == null) {
+            throw new Exception("Invalid conversion pixel type: $type.");
         }
 
-        // save data
+        // save to database
         $this->row->name = $data['name'];
-        $this->row->data = json_encode($data);
-        $this->row->flags |= $flags;
+        $this->row->data = json_encode(array('type' => $type));
         $this->row->save();
-
-        // clear cache
-        $this->_data = null;
 
         return $this;
     }
@@ -233,7 +232,7 @@ class Segment
     //-------------------------------------------------------------------------
 
     /**
-     * Sync retargeting pixel data to AppNexus.
+     * Sync conversion pixel data to AppNexus.
      */
     public function sync()
     {
@@ -243,8 +242,7 @@ class Segment
 
         // create new segment
         if ($this->getAppNexusData() == null) {
-            $segment = SegmentService::addSegment(
-                $syncData, $advertiserId);
+            $pixel = PixelService::addPixel($advertiserId, $syncData);
 
             // pixel should be emailed after inital sync
             $this->row->flags |= self::FLAG_EMAIL;
@@ -252,47 +250,16 @@ class Segment
         // update existing segment
         } else {
             $pixelId = $this->getAppNexusData()->id;
-            $segment = SegmentService::updateSegment(
-                $pixelId, $syncData, $advertiserId);
+            $pixel = PixelService::updatePixel(
+                $pixelId, $advertiserId, $syncData);
         }
 
         // save to database
-        $this->row->appNexusData = $segment->toJson();
+        $this->row->appNexusData = $pixel->toJson();
         $this->row->save();
 
         // clear cache
         $this->_appNexus = null;
-    }
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * Update pixels deleted status.
-     *
-     * @param bool $delete
-     *
-     * @return this
-     */
-    public function setDeleted($delete)
-    {
-        // updating deleted status will require sync to appnexus
-        if ($this->isDeleted() != $delete) {
-            $flags = $this->row->flags;
-
-            // update flags
-            Flags::setFlag($flags, self::FLAG_SYNC);
-            if ($delete) {
-                Flags::setFlag($flags, self::FLAG_DELETED);
-            } else {
-                Flags::unsetFlag($flags, self::FLAG_DELETED);
-            }
-
-            // save to db
-            $this->row->flags = $flags;
-            $this->row->save();
-        }
-
-        return $this;
     }
 
     //-------------------------------------------------------------------------
@@ -326,19 +293,13 @@ class Segment
     //-------------------------------------------------------------------------
 
     /**
-     * Get segment code.
+     * Get pixel javascript code.
      *
      * @return string
      */
     public function generateTag()
     {
-        // grab pixel
-        $pixel = $this->getData();
-        $jsType = $pixel['tagType'] == 'javascript';
-        $secure = $pixel['securityType'] == 'secure';
-
-        // generate tag
-        return $this->_generateTag($jsType, $secure);
+        return $this->_generateTag(true, true);
     }
 
     //-------------------------------------------------------------------------
@@ -346,7 +307,7 @@ class Segment
     //-------------------------------------------------------------------------
 
     /**
-     * Get segment code.
+     * Get pixel code.
      *
      * @param bool $javascript
      * @param bool $secure
@@ -371,17 +332,17 @@ class Segment
         // tag depends on type
         if ($javascript) {
             $tag =
-                "<script src=\"$url/seg?add={$pixel->id}&t=1\" type=\"text/javascript\"></script>";
+                "<script src=\"$url/px?id={$pixel->id}&t=1\" type=\"text/javascript\"></script>";
         } else {
             $tag =
-                "<img src=\"$url/seg?add={$pixel->id}&t=2\" width=\"1\" height=\"1\" />";
+                "<img src=\"$url/px?id={$pixel->id}&t=2\" width=\"1\" height=\"1\" />";
         }
 
         // generate tag
         $html =
-            "<!-- Segment Pixel - {$this->row->name} - DO NOT MODIFY -->".PHP_EOL.
+            "<!-- Conversion Pixel - {$this->row->name} - DO NOT MODIFY -->".PHP_EOL.
             $tag.PHP_EOL.
-            '<!-- End of Segment Pixel -->';
+            '<!-- End of Conversion Pixel -->';
 
         return $html;
     }
@@ -410,36 +371,18 @@ class Segment
      */
     protected function _getSyncData()
     {
-        $campaign = $this->getCampaign();
         $data = $this->getData();
 
-        // calculate expiration minutes
-        if ($data['expiryType'] == 'no-expire') {
-            $minutes = null;
-        } else {
-            switch ($data['expiryUnit']) {
-                case 'minute':
-                    $multiplier = 1;
-                    break;
-                case 'hour':
-                    $multiplier = 60;
-                    break;
-                case 'day':
-                    $multiplier = 60 * 24;
-                    break;
-            }
-            $minutes = $data['expiryAmount'] * $multiplier;
-        }
+        // [moiz] looks like the post_view_value and the post_click_value
+        //  fields are used as overrides and not implemented in the appnexus
+        //  console.  appnexus advised not using this field and instead
+        //  setting the values on the line item.
 
         // construct sync hash
-        $deleted = $this->isDeleted();
-        $status = $deleted ? ' (inactive)' : '';
-        $name = "{$campaign->row->name} - {$this->row->name}".$status;
         $syncData = array(
-            'code' => "pixel-{$this->row->id}_campaign-{$campaign->row->id}",
-            'state' => $deleted ? 'inactive' : 'active',
-            'short_name' => $name,
-            'expire_minutes' => $minutes,
+            'code' => "pixels_{$this->row->id}",
+            'name' => $this->row->name,
+            'trigger_type' => $data['type'],
         );
 
         return $syncData;
