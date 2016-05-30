@@ -396,8 +396,6 @@ class Api
         // validate input is of the correct type
         if (!is_array($json)) {
             $errorMsg = 'Invalid type passed into Api::isValid method, '. 'expected array, received '.gettype($json).'.';
-            BookingEngine_Debug::printr($errorMsg, false);
-            BookingEngine_Debug::printr($json);
             Monolog::addInfo($errorMsg);
             throw new \Exception($errorMsg);
         }
@@ -405,8 +403,6 @@ class Api
         // validate json
         if (!array_key_exists('response', $json)) {
             $errorMsg = 'Invalid AppNexus response.';
-            BookingEngine_Debug::printr($errorMsg, false);
-            BookingEngine_Debug::printr($json);
             Monolog::addInfo($errorMsg);
             throw new \Exception($errorMsg);
         }
@@ -471,8 +467,6 @@ class Api
         $status = self::_isValid($json);
         if ($status != self::OK) {
             $errorMsg = "AppNexus authorization failed with: $status!";
-            BookingEngine_Debug::printr($errorMsg, false);
-            BookingEngine_Debug::printr($json);
             throw new \Exception($errorMsg);
         }
 
