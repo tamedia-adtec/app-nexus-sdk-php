@@ -494,7 +494,7 @@ class Api
         if (time() - $token['created'] > 7200 || '' === $token['token'] || $force) {
             $token['token'] = self::_requestAuthenticationToken();
             $token['created'] = time();
-            $fileSystem->write($tokenFile, serialize($token));
+            $fileSystem->put($tokenFile, serialize($token));
         }
 
         self::$_token = $token;
