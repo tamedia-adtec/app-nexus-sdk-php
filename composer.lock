@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "771345146ebb65fecda63396a04f9a20",
-    "content-hash": "a0cb766a691e75b85729b5ade1b374c4",
+    "hash": "f43746ab194462577161196d30d55e30",
+    "content-hash": "1aa878687e5500c271f118df00818a50",
     "packages": [
         {
             "name": "league/flysystem",
@@ -214,7 +214,9 @@
                 "psr-3"
             ],
             "time": "2016-01-06 21:40:42"
-        },
+        }
+    ],
+    "packages-dev": [
         {
             "name": "symfony/polyfill-mbstring",
             "version": "dev-master",
@@ -338,7 +340,6 @@
             "time": "2016-05-25 08:18:05"
         }
     ],
-    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": [],
