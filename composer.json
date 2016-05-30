@@ -1,6 +1,6 @@
 {
-    "name": "exactdrive/app-nexus-api-php",
-    "description": "App Nexus API for PHP",
+    "name": "exactdrive/app-nexus-sdk-php",
+    "description": "App Nexus SDK for PHP",
     "license": "MIT",
     "authors": [
         {
