@@ -118,7 +118,7 @@ class AppNexusArray implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function getIterator()
     {
-        return new ArrayIterator($this->_array);
+        return new \ArrayIterator($this->_array);
     }
 
     //-------------------------------------------------------------------------

@@ -268,7 +268,7 @@ class CampaignService extends Api
     private static function _createCampaignHash($campaign)
     {
         if (is_object($campaign)) {
-            $pruned = new stdClass();
+            $pruned = new \stdClass();
             foreach (self::$fields as $key) {
                 if (property_exists($campaign, $key)) {
                     $pruned->$key = $campaign->$key;

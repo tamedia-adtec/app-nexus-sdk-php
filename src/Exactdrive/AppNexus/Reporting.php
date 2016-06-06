@@ -294,8 +294,8 @@ class Reporting
 
             // set inverval
             if ($this->getStartDate() && $this->getEndDate()) {
-                $startDate = new DateTime($this->getStartDate());
-                $endDate = new DateTime($this->getEndDate());
+                $startDate = new \DateTime($this->getStartDate());
+                $endDate = new \DateTime($this->getEndDate());
                 $report['start_date'] = $startDate->format('Y-m-d');
                 $report['end_date'] = $endDate->format('Y-m-d');
             } else {
@@ -365,7 +365,7 @@ class Reporting
     public function getAdvertiserId()
     {
         if (!$this->_advertiserId) {
-            throw new Exception('Advertiser ID for reporting is not set');
+            throw new \Exception('Advertiser ID for reporting is not set');
         }
 
         return $this->_advertiserId;
@@ -395,7 +395,7 @@ class Reporting
     public function getReportId()
     {
         if (!$this->_reportId) {
-            throw new Exception('Report ID for reporting is not set');
+            throw new \Exception('Report ID for reporting is not set');
         }
 
         return $this->_reportId;
@@ -595,7 +595,7 @@ class Reporting
 
         // Check to make sure the selected interval is a valid interval
         if (!array_key_exists($this->_selectedInterval, $this->getIntervals())) {
-            throw new Exception('Reporting time interval is not set');
+            throw new \Exception('Reporting time interval is not set');
         }
 
         return $this->_selectedInterval;

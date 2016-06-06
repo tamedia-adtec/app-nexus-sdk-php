@@ -270,7 +270,7 @@ class ProfileService extends Api
     {
         if (empty($profile)) return null;
 
-        $pruned = new stdClass();
+        $pruned = new \stdClass();
         foreach (self::$fields as $key) {
             if (property_exists($profile, $key)) {
                 $pruned->$key = $profile->$key;

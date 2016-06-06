@@ -91,7 +91,7 @@ class Pixel
         // grab conversion type
         $type = self::getPixelType($viewCPA, $clickCPA);
         if ($type == null) {
-            throw new Exception("Invalid conversion pixel type: $type.");
+            throw new \Exception("Invalid conversion pixel type: $type.");
         }
 
         // save to database

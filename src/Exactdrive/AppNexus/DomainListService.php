@@ -113,7 +113,7 @@ class DomainListService extends Api
       */
      private static function _createHash($data)
      {
-         $pruned = new stdClass();
+         $pruned = new \stdClass();
          foreach (self::$fields as $key) {
              if (property_exists($data, $key)) {
                  $pruned->$key = $data->$key;
