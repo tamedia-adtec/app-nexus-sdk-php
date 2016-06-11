@@ -85,27 +85,29 @@ class Pixel
      */
     public static function create($campaignId, $data)
     {
-        $viewCPA = $data['postViewCPA'];
-        $clickCPA = $data['postClickCPA'];
+        // TODO: Re-implement without dependency from the old campaign model
+        // $viewCPA = $data['postViewCPA'];
+        // $clickCPA = $data['postClickCPA'];
 
-        // grab conversion type
-        $type = self::getPixelType($viewCPA, $clickCPA);
-        if ($type == null) {
-            throw new \Exception("Invalid conversion pixel type: $type.");
-        }
+        // // grab conversion type
+        // $type = self::getPixelType($viewCPA, $clickCPA);
+        // if ($type == null) {
+        //     throw new \Exception("Invalid conversion pixel type: $type.");
+        // }
 
-        // save to database
-        $pixelTable = new Campaigns_Model_DbTable_Pixels();
-        $row = $pixelTable->createRow(array(
-            'campaignId' => $campaignId,
-            'type' => Campaigns_Model_DbTable_Pixels::TYPE_CONVERSION,
-            'name' => $data['name'],
-            'data' => json_encode(array('type' => $type)),
-            'flags' => self::FLAG_SYNC,
-        ));
-        $row->save();
+        // // save to database
 
-        return new self($row);
+        // $pixelTable = new Campaigns_Model_DbTable_Pixels();
+        // $row = $pixelTable->createRow(array(
+        //     'campaignId' => $campaignId,
+        //     'type' => Campaigns_Model_DbTable_Pixels::TYPE_CONVERSION,
+        //     'name' => $data['name'],
+        //     'data' => json_encode(array('type' => $type)),
+        //     'flags' => self::FLAG_SYNC,
+        // ));
+        // $row->save();
+
+        // return new self($row);
     }
 
     //-------------------------------------------------------------------------

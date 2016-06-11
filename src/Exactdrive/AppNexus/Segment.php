@@ -69,18 +69,19 @@ class Segment
      */
     public static function create($campaignId, $data)
     {
-        // save to database
-        $pixelTable = new Campaigns_Model_DbTable_Pixels();
-        $row = $pixelTable->createRow(array(
-            'campaignId' => $campaignId,
-            'type' => Campaigns_Model_DbTable_Pixels::TYPE_RETARGETING,
-            'name' => $data['name'],
-            'data' => json_encode($data),
-            'flags' => self::FLAG_SYNC,
-        ));
-        $row->save();
+        // TODO: Re-implement without dependency from the old campaign model
+        // // save to database
+        // $pixelTable = new Campaigns_Model_DbTable_Pixels();
+        // $row = $pixelTable->createRow(array(
+        //     'campaignId' => $campaignId,
+        //     'type' => Campaigns_Model_DbTable_Pixels::TYPE_RETARGETING,
+        //     'name' => $data['name'],
+        //     'data' => json_encode($data),
+        //     'flags' => self::FLAG_SYNC,
+        // ));
+        // $row->save();
 
-        return new self($row);
+        // return new self($row);
     }
 
     //-------------------------------------------------------------------------

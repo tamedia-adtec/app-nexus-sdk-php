@@ -53,25 +53,26 @@ class Campaign
     //-------------------------------------------------------------------------
 
     /**
-     * Retrives the conversion pixel generated for this campaign.
+     * Retrieves the conversion pixel generated for this campaign.
      *
      * @return hash
      */
     public function conversionPixel()
     {
-        $pixelTable = new Campaigns_Model_DbTable_Pixels();
-        $pixels = $pixelTable->fetchAllConversionPixels($this->row->id);
-        if (count($pixels) == 0) {
-            return;
-        } else {
-            return new Pixel($pixels->current());
-        }
+        // TODO: Re-implement without dependency from the old campaign model
+        // $pixelTable = new Campaigns_Model_DbTable_Pixels();
+        // $pixels = $pixelTable->fetchAllConversionPixels($this->row->id);
+        // if (count($pixels) == 0) {
+        //     return;
+        // } else {
+        //     return new Pixel($pixels->current());
+        // }
     }
 
     //-------------------------------------------------------------------------
 
     /**
-     * Retrives the retargetting pixels generated for this campaign.
+     * Retrieves the retargetting pixels generated for this campaign.
      *
      * @param bool $deleted => retrieve deleted pixels
      *
@@ -79,16 +80,17 @@ class Campaign
      */
     public function retargetingPixels($deleted = false)
     {
-        $pixelTable = new Campaigns_Model_DbTable_Pixels();
-        $pixels = $pixelTable->fetchAllRetargetingPixels(
-            $this->row->id, $deleted);
-        if (count($pixels) == 0) {
-            return;
-        } else {
-            return array_map(function ($pixel) {
-                return new Segment($pixel);
-            }, iterator_to_array($pixels));
-        }
+        // TODO: Re-implement without dependency from the old campaign model
+        // $pixelTable = new Campaigns_Model_DbTable_Pixels();
+        // $pixels = $pixelTable->fetchAllRetargetingPixels(
+        //     $this->row->id, $deleted);
+        // if (count($pixels) == 0) {
+        //     return;
+        // } else {
+        //     return array_map(function ($pixel) {
+        //         return new Segment($pixel);
+        //     }, iterator_to_array($pixels));
+        // }
     }
 
     //-------------------------------------------------------------------------
