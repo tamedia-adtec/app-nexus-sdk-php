@@ -3,17 +3,17 @@
 namespace Exactdrive\AppNexus;
 
 //-----------------------------------------------------------------------------
-// AdvertiserService.php
+// InsertionOrderService.php
 //-----------------------------------------------------------------------------
 
 /**
- * AppNexus Advertiser Api service.
+ * AppNexus Insertion Order Api service.
  *
  * @package AppNexus
- * @author Moiz Merchant <moiz@exactdrive.com>
+ * @author Moiz Merchant <moiz@exactdrive.com>, Oliver Milanovic <omilanovic@codeframe.ch>
  * @version $Id$
  */
-class AdvertiserService extends Api
+class InsertionOrderService extends Api
 {
 
     //-------------------------------------------------------------------------
@@ -21,29 +21,34 @@ class AdvertiserService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * Advertiser properties which can be updated with AppNexus server.
-     *   https://wiki.appnexus.com/pages/viewpage.action?title=Advertiser+Service&spaceKey=api#AdvertiserService-JSONFields
+     * Insertion order properties which can be updated with AppNexus server.
+     *   https://wiki.appnexus.com/display/api/Insertion+Order+Service#InsertionOrderService-JSONFields
      *
      * @var array
      */
     public static $fields = array(
-        'code',                 // custom code for the advertiser
-        'name',                 // name of advertiser
-        'state',                // 'active' / 'inactive'
-        'billing_name',         // for reference
-        'billing_phone',        // for reference
-        'billing_address1',     // for reference
-        'billing_address2',     // for reference
-        'billing_city',         // for reference
-        'billing_state',        // for reference
-        'billing_country',      // for reference
-        'billing_zip',          // for reference
-        'labels',               // set labels
-        'default_currency',     // set member default
-        'timezone',             // default time zone
-        'time_format',          // default time format
-        'use_insertion_orders', // see the Insertion Order Service for details
-        'profile_id',           //  a profile set at the advertiser level will apply to all traffic for your advertiser
+        'state',                        // 'active' / 'inactive'
+        'code',                         // custom code for the campaign
+        'name',                         // name of the campaign
+        'advertiser_id',                // id of the advertiser which the campaign belongs
+        'start_date',                   // date and time when the campaign should start serving
+        'end_date',                     // date and time when the campaign should stop serving
+        'timezone',                     // timezone of the campaign
+        'currency',                     // currency used for this insertion order
+        'comments',                     // comments about the insertion order
+        'billing_code',                 // for reference
+        'spend_protection_pixels',      // for reference
+        'labels',                       // optional: 'Trafficker', 'Sales Rep', 'Campaign Type'
+        'broker_fees',                  // commissions that the network must pass to brokers when serving an ad
+        'budget_intervals',
+        'lifetime_pacing',
+        'lifetime_budget',              // lifetime budget in revenue
+        'lifetime_budget_imps',         // lifetime budget in impressions
+        'enable_pacing',                // if true, daily budgeted spend is spread out evenly throughout a day
+        'lifetime_pacing_span',
+        'daily_budget',                 // daily budget in revenue
+        'daily_budget_imps',            // daily budget in impressions
+        'lifetime_pacing_pct',
     );
 
     //-------------------------------------------------------------------------
@@ -51,11 +56,11 @@ class AdvertiserService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * AppNexus advertiser service url.
+     * AppNexus insertion order service url.
      */
     public static function getBaseUrl()
     {
-        $url = Api::getBaseUrl().'/advertiser';
+        $url = Api::getBaseUrl().'/insertion-order';
 
         return $url;
     }
@@ -63,19 +68,24 @@ class AdvertiserService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * Add a new advertiser.
+     * Add a new insertion order.
      *
-     * @param  array $advertiser => Only valid fields will be passed to api.
+     * @param  int $advertiserId => Advertiser id of insertion order.
+     * @param  array $insertionOrder => Only valid fields will be passed to api.
      *
-     * @return AppNexusObject $advertiser => Newly created appnexus advertiser id.
+     * @return AppNexusObject $insertionOrder     => Newly created appnexus insertion order.
      */
-    public static function addAdvertiser( $advertiser )
+    public static function addInsertionOrder( $advertiserId, $insertionOrder )
     {
         // construct url
-        $url = self::getBaseUrl();
+        $url = self::getBaseUrl().'?'.http_build_query(
+                array(
+                    'advertiser_id' => $advertiserId,
+                )
+            );
 
         // package up the data, don't bother running query on invalid data
-        $data = self::_createAdvertiserHash( $advertiser );
+        $data = self::_createInsertionOrderHash( $insertionOrder );
         if ($data == null) {
             return null;
         }
@@ -89,24 +99,26 @@ class AdvertiserService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * Update an existing advertiser.
+     * Update an existing insertion order.
      *
-     * @param  int $id => Id of advertiser.
-     * @param  array $advertiser => Only valid fields will be passed to api.
+     * @param  int $id => Id of insertion order.
+     * @param  int $advertiserId => Advertiser id of insertion order.
+     * @param  array $insertionOrder => Only valid fields will be passed to api.
      *
-     * @return AppNexusObject $advertiser => Updated appnexus advertiser.
+     * @return AppNexusObject $insertionOrder     => Updated appnexus insertion order.
      */
-    public static function updateAdvertiser( $id, $advertiser )
+    public static function updateInsertionOrder( $id, $advertiserId, $insertionOrder )
     {
         // construct url
         $url = self::getBaseUrl().'?'.http_build_query(
                 array(
-                    'id' => $id,
+                    'id'            => $id,
+                    'advertiser_id' => $advertiserId,
                 )
             );
 
         // package up the data, don't bother running query on invalid data
-        $data = self::_createAdvertiserHash( $advertiser );
+        $data = self::_createInsertionOrderHash( $insertionOrder );
         if ($data == null) {
             return null;
         }
@@ -120,20 +132,23 @@ class AdvertiserService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * View all advertisers, results are paged.
+     * View all insertion orders for an advertiser, results are paged.
      *
+     * @param int $advertiserId
      * @param int $start_element
      * @param int $num_elements
      *
-     * @return AppNexusArray $advertisers
+     * @return AppNexusArray $insertionOrders
      */
-    public static function getAllAdvertisers(
+    public static function getAllInsertionOrders(
+        $advertiserId,
         $start_element = 0,
         $num_elements = 100
     ) {
         // construct url
         $url = self::getBaseUrl().'?'.http_build_query(
                 array(
+                    'advertiser_id' => $advertiserId,
                     'start_element' => $start_element,
                     'num_elements'  => $num_elements,
                 )
@@ -149,19 +164,19 @@ class AdvertiserService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * View advertisers speficied by ids, results are paged.
+     * View insertion orders specified by ids, results are paged.
      *
      * @param  int[] $ids
      *
      * @return array|AppNexusArray
      */
-    public static function getAdvertisers( $ids )
+    public static function getInsertionOrders( $ids )
     {
         // [moiz] need to fix this...
 
         // shortcut if only single id is specified
         if (count( $ids ) == 1) {
-            return array( self::getAdvertiser( $ids[0] ) );
+            return array( self::getInsertionOrder( $ids[0] ) );
         }
 
         // construct url
@@ -181,13 +196,13 @@ class AdvertiserService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * View a specific advertiser.
+     * View a specific insertion order.
      *
      * @param  int $id
      *
-     * @return AppNexusObject $advertiser
+     * @return AppNexusObject $insertionOrder
      */
-    public static function getAdvertiser( $id )
+    public static function getInsertionOrder( $id )
     {
         // construct url
         $url = self::getBaseUrl().'?'.http_build_query(
@@ -206,16 +221,16 @@ class AdvertiserService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * Search for advertisers with ids or names containing certain characters,
+     * Search for insertion orders with ids or names containing certain characters,
      *  results are paged.
      *
      * @param string $term
      * @param int $start_element
      * @param int $num_elements
      *
-     * @return AppNexusArray $advertisers
+     * @return AppNexusArray $insertionOrders
      */
-    public static function searchAdvertisers(
+    public static function searchInsertionOrders(
         $term,
         $start_element = 0,
         $num_elements = 100
@@ -239,18 +254,20 @@ class AdvertiserService extends Api
     //-------------------------------------------------------------------------
 
     /**
-     * Delete an advertiser.
+     * Delete a insertion order.
      *
-     * @param  int $id
+     * @param  int $id => Id of insertion order.
+     * @param  int $advertiserId => Advertiser id of insertion order.
      *
      * @return bool $status
      */
-    public static function deleteAdvertiser( $id )
+    public static function deleteInsertionOrder( $id, $advertiserId )
     {
         // construct url
         $url = self::getBaseUrl().'?'.http_build_query(
                 array(
-                    'id' => $id,
+                    'id'            => $id,
+                    'advertiser_id' => $advertiserId,
                 )
             );
 
@@ -261,56 +278,40 @@ class AdvertiserService extends Api
     }
 
     //-------------------------------------------------------------------------
-
-    /**
-     * Retrive quick statistics about an advertiser.
-     *
-     * @param  int $id
-     * @param  string $interval
-     *
-     * @return AppNexusObject $advertiser
-     */
-    public static function getQuickStats( $id, $interval = '7day' )
-    {
-        // construct url
-        $url = self::getBaseUrl().'?'.http_build_query(
-                array(
-                    'id'       => $id,
-                    'stats'    => 'true',
-                    'interval' => $interval,
-                )
-            );
-
-        // query app nexus server
-        $response = self::makeRequest( $url, Api::GET );
-
-        // wrap response with app nexus object
-        return new AppNexusObject( $response, AppNexusObject::MODE_READ_WRITE );
-    }
-
-    //-------------------------------------------------------------------------
     // internal methods
     //-------------------------------------------------------------------------
 
     /**
-     * Returns an advertiser hash containing only the fields which are allowed
+     * Returns a insertion order hash containing only the fields which are allowed
      *  to be updated in the format accepted by AppNexus.
      *
-     * @param  array $advertiser
+     * @param  array $insertionOrder
      *
-     * @return array $advertiser
+     * @return array|null|object
      */
-    private static function _createAdvertiserHash( $advertiser )
+    private static function _createInsertionOrderHash( $insertionOrder )
     {
-        $pruned = array();
-        foreach (self::$fields as $key) {
-            if (array_key_exists( $key, $advertiser )) {
-                $pruned[$key] = $advertiser[$key];
+        if (is_object( $insertionOrder )) {
+            $pruned = new \stdClass();
+            foreach (self::$fields as $key) {
+                if (property_exists( $insertionOrder, $key )) {
+                    $pruned->$key = $insertionOrder->$key;
+                }
             }
-        }
 
-        // return null if no valid fields found
-        return empty( $pruned ) ? null : array( 'advertiser' => $pruned );
+            // return null if no valid fields found
+            return empty( $pruned ) ? null : (object) array( 'insertion-order' => $pruned );
+        } else {
+            $pruned = array();
+            foreach (self::$fields as $key) {
+                if (array_key_exists( $key, $insertionOrder )) {
+                    $pruned[$key] = $insertionOrder[$key];
+                }
+            }
+
+            // return null if no valid fields found
+            return empty( $pruned ) ? null : array( 'insertion-order' => $pruned );
+        }
     }
 
 }

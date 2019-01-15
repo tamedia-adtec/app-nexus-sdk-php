@@ -86,7 +86,11 @@ class CreativeService extends Api
         'content_source',          // source of this creative's content: 'standard', 'mediation'
         'custom_request_template', // association between this creative and a custom request template which is used to populate the creative with content
         'competitive_brands',      // creatives associated with the brands in this array will not serve together in /mtj auctions
-        'competitive_categories'   // creatives associated with the categories in this array will not serve together in /mtj auctions
+        'competitive_categories',  // creatives associated with the categories in this array will not serve together in /mtj auctions
+        'native',
+        'currency',
+        'thirdparty_pixels',
+        'impression_trackers',
     );
 
     //-------------------------------------------------------------------------
@@ -98,7 +102,8 @@ class CreativeService extends Api
      */
     public static function getBaseUrl()
     {
-        $url = Api::getBaseUrl() . '/creative';
+        $url = Api::getBaseUrl().'/creative';
+
         return $url;
     }
 
@@ -107,28 +112,31 @@ class CreativeService extends Api
     /**
      * Add a new creative.
      *
-     * @param  int  $advertiserId => Advertiser id of creative.
-     * @param  hash $creative     => Only valid fields will be passed to api.
-     * @return hash $creative     => Newly created appnexus creative.
+     * @param  int $advertiserId => Advertiser id of creative.
+     * @param  array $creative => Only valid fields will be passed to api.
+     *
+     * @return AppNexusObject $creative     => Newly created appnexus creative.
      */
-    public static function addCreative($advertiserId, $creative)
+    public static function addCreative( $advertiserId, $creative )
     {
         // construct url
-        $url = self::getBaseUrl() . '?' . http_build_query(array(
-            'advertiser_id' => $advertiserId
-        ));
+        $url = self::getBaseUrl().'?'.http_build_query(
+                array(
+                    'advertiser_id' => $advertiserId,
+                )
+            );
 
         // package up the data, don't bother running query on invalid data
-        $data = self::_createCreativeHash($creative);
+        $data = self::_createCreativeHash( $creative );
         if ($data == null) {
             return null;
         }
 
         // query app nexus server
-        $response = self::makeRequest($url, Api::POST, $data);
+        $response = self::makeRequest( $url, Api::POST, $data );
 
         // wrap response with app nexus object
-        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
+        return new AppNexusObject( $response, AppNexusObject::MODE_READ_WRITE );
     }
 
     //-------------------------------------------------------------------------
@@ -136,30 +144,33 @@ class CreativeService extends Api
     /**
      * Update an existing creative.
      *
-     * @param  int  $id           => Id of creative.
-     * @param  int  $advertiserId => Id of the associated advertiser.
-     * @param  hash $creative     => Only valid fields will be passed to api.
-     * @return hash $creative     => Updated appnexus creative.
+     * @param  int $id => Id of creative.
+     * @param  int $advertiserId => Id of the associated advertiser.
+     * @param  array $creative => Only valid fields will be passed to api.
+     *
+     * @return AppNexusObject $creative     => Updated appnexus creative.
      */
-    public static function updateCreative($id, $advertiserId, $creative)
+    public static function updateCreative( $id, $advertiserId, $creative )
     {
         // construct url
-        $url = self::getBaseUrl() . '?' . http_build_query(array(
-            'id'            => $id,
-            'advertiser_id' => $advertiserId
-        ));
+        $url = self::getBaseUrl().'?'.http_build_query(
+                array(
+                    'id'            => $id,
+                    'advertiser_id' => $advertiserId,
+                )
+            );
 
         // package up the data, don't bother running query on invalid data
-        $data = self::_createCreativeHash($creative);
+        $data = self::_createCreativeHash( $creative );
         if ($data == null) {
             return null;
         }
 
         // query app nexus server
-        $response = self::makeRequest($url, Api::PUT, $data);
+        $response = self::makeRequest( $url, Api::PUT, $data );
 
         // wrap response with app nexus object
-        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
+        return new AppNexusObject( $response, AppNexusObject::MODE_READ_WRITE );
     }
 
     //-------------------------------------------------------------------------
@@ -167,16 +178,21 @@ class CreativeService extends Api
     /**
      * View all creatives, can filter by advertiser, results are paged.
      *
-     * @param  int   $advertiserId
-     * @return array $creatives
+     * @param int $advertiserId
+     * @param int $start_element
+     * @param int $num_elements
+     *
+     * @return AppNexusArray $creatives
      */
-    public static function getAllCreatives($advertiserId = null,
-        $start_element = 0, $num_elements = 100)
-    {
+    public static function getAllCreatives(
+        $advertiserId = null,
+        $start_element = 0,
+        $num_elements = 100
+    ) {
         // construct query
         $query = array(
             'start_element' => $start_element,
-            'num_elements'  => $num_elements
+            'num_elements'  => $num_elements,
         );
 
         // add advertiser filter if requested
@@ -185,41 +201,44 @@ class CreativeService extends Api
         }
 
         // construct url
-        $url = self::getBaseUrl() . '?' . http_build_query($query);
+        $url = self::getBaseUrl().'?'.http_build_query( $query );
 
         // query app nexus server
-        $response = self::makeRequest($url, Api::GET);
+        $response = self::makeRequest( $url, Api::GET );
 
         // wrap response with app nexus object
-        return new AppNexusArray($response, AppNexusObject::MODE_READ_WRITE);
+        return new AppNexusArray( $response, AppNexusObject::MODE_READ_WRITE );
     }
 
     //-------------------------------------------------------------------------
 
     /**
-     * View creatives speficied by ids, results are paged.
+     * View creatives specified by ids, results are paged.
      *
-     * @param  array(int) $ids
-     * @return array      $creatives
+     * @param  int[] $ids
+     *
+     * @return AppNexusArray $creatives
      */
-    public static function getCreatives($ids)
+    public static function getCreatives( $ids )
     {
         // construct url
-        $url = self::getBaseUrl() . '?' . http_build_query(array(
-            'id' => implode(',', $ids)
-        ));
+        $url = self::getBaseUrl().'?'.http_build_query(
+                array(
+                    'id' => implode( ',', $ids ),
+                )
+            );
 
         // query app nexus server
-        $response = self::makeRequest($url, Api::GET);
+        $response = self::makeRequest( $url, Api::GET );
 
         // wrap response to be an array if only single result queried
-        if (count($ids) == 1) {
+        if (count( $ids ) == 1) {
             $key            = $response['dbg_info']['output_term'];
-            $response[$key] = array($response[$key]);
+            $response[$key] = array( $response[$key] );
         }
 
         // wrap response with app nexus object
-        return new AppNexusArray($response, AppNexusObject::MODE_READ_WRITE);
+        return new AppNexusArray( $response, AppNexusObject::MODE_READ_WRITE );
     }
 
     //-------------------------------------------------------------------------
@@ -227,21 +246,24 @@ class CreativeService extends Api
     /**
      * View a specific creative.
      *
-     * @param  int  $id
-     * @return hash $creative
+     * @param  int $id
+     *
+     * @return AppNexusObject $creative
      */
-    public static function getCreative($id)
+    public static function getCreative( $id )
     {
         // construct url
-        $url = self::getBaseUrl() . '?' . http_build_query(array(
-            'id' => $id
-        ));
+        $url = self::getBaseUrl().'?'.http_build_query(
+                array(
+                    'id' => $id,
+                )
+            );
 
         // query app nexus server
-        $response = self::makeRequest($url, Api::GET);
+        $response = self::makeRequest( $url, Api::GET );
 
         // wrap response with app nexus object
-        return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
+        return new AppNexusObject( $response, AppNexusObject::MODE_READ_WRITE );
     }
 
     //-------------------------------------------------------------------------
@@ -249,20 +271,23 @@ class CreativeService extends Api
     /**
      * Delete a creative.
      *
-     * @param  int  $id           => Id of creative.
-     * @param  int  $advertiserId => Advertiser id of creative.
+     * @param  int $id => Id of creative.
+     * @param  int $advertiserId => Advertiser id of creative.
+     *
      * @return bool $status
      */
-    public static function deleteCreative($id, $advertiserId)
+    public static function deleteCreative( $id, $advertiserId )
     {
         // construct url
-        $url = self::getBaseUrl() . '?' . http_build_query(array(
-            'id'            => $id,
-            'advertiser_id' => $advertiserId
-        ));
+        $url = self::getBaseUrl().'?'.http_build_query(
+                array(
+                    'id'            => $id,
+                    'advertiser_id' => $advertiserId,
+                )
+            );
 
         // query app nexus server
-        $response = self::makeRequest($url, Api::DELETE);
+        self::makeRequest( $url, Api::DELETE );
 
         return true;
     }
@@ -275,20 +300,21 @@ class CreativeService extends Api
      * Returns a creative hash containing only the fields which are allowed
      *  to be updated in the format accepted by AppNexus.
      *
-     * @param  hash $creative
-     * @return hash $creative
+     * @param  array $creative
+     *
+     * @return array $creative
      */
-    private static function _createCreativeHash($creative)
+    private static function _createCreativeHash( $creative )
     {
         $pruned = array();
         foreach (self::$fields as $key) {
-            if (array_key_exists($key, $creative)) {
+            if (array_key_exists( $key, $creative )) {
                 $pruned[$key] = $creative[$key];
             }
         }
 
         // return null if no valid fields found
-        return empty($pruned) ? null : array('creative' => $pruned);
+        return empty( $pruned ) ? null : array( 'creative' => $pruned );
     }
 
 }

@@ -29,7 +29,7 @@ class ReportService extends Api
         'report_type',            // determines which information will be returned
         'timezone',               // determines which timezone the data will be reported in
         'filters',                // list of filter objects to apply to the report
-        'group_filters',          // allows specifing an operation to perform on one or more filters
+        'group_filters',          // allows specifying an operation to perform on one or more filters
         'columns',                // list of columns to include in the report
         'row_per',                // for most reports, selected dimensions are grouped automatically
         'groups',                 // same as row_per
@@ -74,26 +74,31 @@ class ReportService extends Api
     /**
      * Request a new report.
      *
-     * @param int  $advertiserId => Advertiser id of report.
-     * @param hash $report       => Only valid fields will be passed to api.
+     * @param int $advertiserId => Advertiser id of report.
+     * @param array $report => Only valid fields will be passed to api.
      *
      * @return int $report_id    => Requested appnexus report id.
      */
-    public static function requestReport($advertiserId, $report)
+    public static function requestReport( $advertiserId = null, $report )
     {
         // construct url
-        $url = self::getBaseUrl().'?'.http_build_query(array(
-            'advertiser_id' => $advertiserId,
-        ));
+        $url = self::getBaseUrl();
+        if ($advertiserId !== null) {
+            $url .= '?'.http_build_query(
+                    array(
+                        'advertiser_id' => $advertiserId,
+                    )
+                );
+        }
 
         // package up the data, don't bother running query on invalid data
-        $data = self::_createReportHash($report);
+        $data = self::_createReportHash( $report );
         if ($data == null) {
-            return;
+            return 0;
         }
 
         // query app nexus server
-        $response = self::makeRequest($url, Api::POST, $data);
+        $response = self::makeRequest( $url, Api::POST, $data );
 
         return $response['report_id'];
     }
@@ -105,17 +110,19 @@ class ReportService extends Api
      *
      * @param int $id => Id of report.
      *
-     * @return hash $response => Query response.
+     * @return array $response => Query response.
      */
-    public static function getReport($id)
+    public static function getReport( $id )
     {
         // construct url
-        $url = self::getBaseUrl().'?'.http_build_query(array(
-            'id' => $id,
-        ));
+        $url = self::getBaseUrl().'?'.http_build_query(
+                array(
+                    'id' => $id,
+                )
+            );
 
         // query app nexus server
-        $response = self::makeRequest($url, Api::GET);
+        $response = self::makeRequest( $url, Api::GET );
 
         // [moiz] once we can encapsulate in a report object can save the
         //   execution status in there, for now just return the response so
@@ -130,17 +137,19 @@ class ReportService extends Api
      *
      * @param int $id => Id of saved report.
      *
-     * @return hash $report_id => Id of report.
+     * @return array $report_id => Id of report.
      */
-    public static function getSavedReportId($id)
+    public static function getSavedReportId( $id )
     {
         // construct url
-        $url = self::getBaseUrl().'?'.http_build_query(array(
-            'saved_report_id' => $id,
-        ));
+        $url = self::getBaseUrl().'?'.http_build_query(
+                array(
+                    'saved_report_id' => $id,
+                )
+            );
 
         // query app nexus server
-        $response = self::makeRequest($url, Api::POST);
+        $response = self::makeRequest( $url, Api::POST );
 
         return $response['report_id'];
     }
@@ -152,17 +161,19 @@ class ReportService extends Api
      *
      * @param int $id => Id of report.
      *
-     * @return hash $response => Query response.
+     * @return array $response => Query response.
      */
-    public static function downloadReport($id)
+    public static function downloadReport( $id )
     {
         // construct url
-        $url = self::getDownloadUrl().'?'.http_build_query(array(
-            'id' => $id,
-        ));
+        $url = self::getDownloadUrl().'?'.http_build_query(
+                array(
+                    'id' => $id,
+                )
+            );
 
         // query app nexus server
-        $response = self::makeRequestRaw($url, Api::GET);
+        $response = self::makeRequestRaw( $url, Api::GET );
 
         return $response;
     }
@@ -175,20 +186,20 @@ class ReportService extends Api
      * Returns an report hash containing only the fields which are allowed
      *  to be updated in the format accepted by AppNexus.
      *
-     * @param hash $report
+     * @param array $report
      *
-     * @return hash $report
+     * @return array $report
      */
-    private static function _createReportHash($report)
+    private static function _createReportHash( $report )
     {
         $pruned = array();
         foreach (self::$fields as $key) {
-            if (array_key_exists($key, $report)) {
+            if (array_key_exists( $key, $report )) {
                 $pruned[$key] = $report[$key];
             }
         }
 
         // return null if no valid fields found
-        return empty($pruned) ? null : array('report' => $pruned);
+        return empty( $pruned ) ? null : array( 'report' => $pruned );
     }
 }

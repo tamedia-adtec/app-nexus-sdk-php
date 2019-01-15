@@ -166,6 +166,7 @@ class AppNexusArray implements \ArrayAccess, \IteratorAggregate, \Countable
         if ($this->areMoreResults()) {
             return $this->_start + count($this);
         }
+
         return null;
     }
 
