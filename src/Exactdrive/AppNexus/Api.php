@@ -543,7 +543,7 @@ class Api
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER     => array( "Authorization: $token" ),
+            CURLOPT_HTTPHEADER     => array( "Authorization: $token", "Content-Type: application/json" ),
         );
 
         // configure curl POST
