@@ -41,6 +41,7 @@ class InsertionOrderService extends Api
         'labels',                       // optional: 'Trafficker', 'Sales Rep', 'Campaign Type'
         'broker_fees',                  // commissions that the network must pass to brokers when serving an ad
         'budget_intervals',
+        'budget_type',                  // The budget type of the insertion order. Values may be 'revenue' or 'impression'.
         'lifetime_pacing',
         'lifetime_budget',              // lifetime budget in revenue
         'lifetime_budget_imps',         // lifetime budget in impressions
