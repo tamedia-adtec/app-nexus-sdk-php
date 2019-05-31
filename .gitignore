@@ -2,3 +2,6 @@
 /vendor/
 /data/
 .padawan
+/composer.phar
+/php-cs-fixer.phar
+/.php_cs.cache
