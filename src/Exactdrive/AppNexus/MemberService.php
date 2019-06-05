@@ -30,7 +30,7 @@ class MemberService extends Api
      *
      * @return AppNexusObject
      */
-    public static function getMemberId(): AppNexusObject
+    public static function getMember(): AppNexusObject
     {
         $url = self::getBaseUrl();
         $response = self::makeRequest($url, Api::GET);
