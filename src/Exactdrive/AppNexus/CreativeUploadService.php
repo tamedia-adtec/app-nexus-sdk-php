@@ -31,7 +31,7 @@ class CreativeUploadService extends Api
      */
     public static function getBaseUrl()
     {
-        $url = Api::getBaseUrl() . 'creative-upload';
+        $url = Api::getBaseUrl() . '/creative-upload';
 
         return $url;
     }
