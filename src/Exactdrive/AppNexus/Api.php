@@ -331,7 +331,7 @@ class Api
         // spit out debug info to app nexus logs
         if (!empty($debugLogger)) {
             $debugLogger->info('Url: ' . $url);
-            $debugLogger->info('Data: ' . json_encode($data));
+            $debugLogger->info('Data: ' . json_encode($data, JSON_UNESCAPED_SLASHES));
         } else {
             Monolog::addInfo("Url: $url");
             Monolog::addInfo('Data: ' . json_encode($data));
@@ -339,9 +339,6 @@ class Api
 
         // grab authentication token
         $token = self::_getAuthenticationToken();
-        if (!empty($debugLogger)) {
-            $debugLogger->info('Authentication token: ' . $token);
-        }
 
         // make request
         $result = self::_makeRequest( $token, $url, $type, $data );
@@ -564,7 +561,7 @@ class Api
         if ($type == self::POST) {
             $curlOptions[CURLOPT_POST] = true;
             if ($data) {
-                $curlOptions[CURLOPT_POSTFIELDS] = json_encode( $data );
+                $curlOptions[CURLOPT_POSTFIELDS] = json_encode( $data, JSON_UNESCAPED_SLASHES );
             } else {
                 array_push( $curlOptions[CURLOPT_HTTPHEADER], 'Content-Length: 0' );
             }
