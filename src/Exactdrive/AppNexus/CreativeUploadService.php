@@ -5,6 +5,8 @@ declare(strict_types = 1);
 namespace Exactdrive\AppNexus;
 
 use Exception;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class CreativeUploadService
@@ -37,13 +39,13 @@ class CreativeUploadService extends Api
     /**
      * @param string $fileName
      * @param int $memberId
-     * @param object|null $debugLogger
+     * @param Logger|null $debugLogger
      *
      * @throws Exception
      *
      * @return AppNexusObject
      */
-    public static function uploadCreative(string $fileName, int $memberId, ?object $debugLogger): AppNexusObject
+    public static function uploadCreative(string $fileName, int $memberId, ?Logger $debugLogger): AppNexusObject
     {
         $query = [
             'member_id' => $memberId,

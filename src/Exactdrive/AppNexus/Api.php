@@ -4,6 +4,7 @@ namespace Exactdrive\AppNexus;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
+use Monolog\Logger;
 
 //-----------------------------------------------------------------------------
 // Api.php
@@ -319,18 +320,18 @@ class Api
      * @param string $url
      * @param string $type
      * @param array $data
-     * @param object|null $debugLogger
+     * @param Logger|null $debugLogger
      *
      * @return array $response
      *
      * @throws \Exception
      */
-    protected static function makeRequest($url, $type = self::GET, $data = null, object $debugLogger = null )
+    protected static function makeRequest($url, $type = self::GET, $data = null, Logger $debugLogger = null )
     {
         // spit out debug info to app nexus logs
         if (!empty($debugLogger)) {
-            $debugLogger::log('Url: ' . $url);
-            $debugLogger::log('Data: ' . json_encode($data));
+            $debugLogger->info('Url: ' . $url);
+            $debugLogger->info('Data: ' . json_encode($data));
         } else {
             Monolog::addInfo("Url: $url");
             Monolog::addInfo('Data: ' . json_encode($data));
