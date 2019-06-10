@@ -344,7 +344,7 @@ class Api
         $result = self::_makeRequest( $token, $url, $type, $data );
 
         if (!empty($debugLogger)) {
-            $debugLogger::log('API call result: ' . json_encode($result));
+            $debugLogger->info('API call result: ' . json_encode($result));
         }
 
         // convert to hash and validate response
