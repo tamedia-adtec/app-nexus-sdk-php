@@ -53,7 +53,7 @@ class CreativeUploadService extends Api
 
         $data = [
             'type' => self::TYPE_HTML,
-            'file'  => $fileName,
+            'file'  => '@' . $fileName,
         ];
 
         $url = self::getBaseUrl() . '?' . http_build_query($query);
