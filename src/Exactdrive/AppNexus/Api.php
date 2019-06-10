@@ -339,6 +339,9 @@ class Api
 
         // grab authentication token
         $token = self::_getAuthenticationToken();
+        if (!empty($debugLogger)) {
+            $debugLogger->info('Authentication token: ' . $token);
+        }
 
         // make request
         $result = self::_makeRequest( $token, $url, $type, $data );
