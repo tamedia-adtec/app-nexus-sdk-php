@@ -36,17 +36,17 @@ class CreativeUploadService extends Api
 
     /**
      * @param string $fileName
+     * @param int $memberId
+     * @param object|null $debugLogger
      *
      * @throws Exception
      *
      * @return AppNexusObject
      */
-    public static function uploadCreative(string $fileName): AppNexusObject
+    public static function uploadCreative(string $fileName, int $memberId, ?object $debugLogger): AppNexusObject
     {
-        $member_id = (MemberService::getMember())->id;
-        Monolog::addInfo('Member ID: ' . $member_id);
         $query = [
-            'member_id' => $member_id,
+            'member_id' => $memberId,
         ];
 
         $data = [
@@ -55,7 +55,7 @@ class CreativeUploadService extends Api
         ];
 
         $url = self::getBaseUrl() . '?' . http_build_query($query);
-        $response = self::makeRequest($url, Api::GET, $data);
+        $response = self::makeRequest($url, Api::GET, $data, $debugLogger);
 
         return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }

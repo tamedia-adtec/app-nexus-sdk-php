@@ -319,22 +319,32 @@ class Api
      * @param string $url
      * @param string $type
      * @param array $data
+     * @param object|null $debugLogger
      *
      * @return array $response
      *
      * @throws \Exception
      */
-    protected static function makeRequest( $url, $type = self::GET, $data = null )
+    protected static function makeRequest($url, $type = self::GET, $data = null, object $debugLogger = null )
     {
         // spit out debug info to app nexus logs
-        Monolog::addInfo( "Url: $url" );
-        Monolog::addInfo( 'Data: '.json_encode( $data ) );
+        if (!empty($debugLogger)) {
+            $debugLogger::log('Url: ' . $url);
+            $debugLogger::log('Data: ' . json_encode($data));
+        } else {
+            Monolog::addInfo("Url: $url");
+            Monolog::addInfo('Data: ' . json_encode($data));
+        }
 
         // grab authentication token
         $token = self::_getAuthenticationToken();
 
         // make request
         $result = self::_makeRequest( $token, $url, $type, $data );
+
+        if (!empty($debugLogger)) {
+            $debugLogger::log('API call result: ' . json_encode($result));
+        }
 
         // convert to hash and validate response
         $json   = json_decode( $result, true );
