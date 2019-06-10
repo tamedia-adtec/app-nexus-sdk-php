@@ -44,6 +44,7 @@ class CreativeUploadService extends Api
     public static function uploadCreative(string $fileName): AppNexusObject
     {
         $member_id = (MemberService::getMember())->id;
+        Monolog::addInfo('Member ID: ' . $member_id);
         $query = [
             'member_id' => $member_id,
         ];
