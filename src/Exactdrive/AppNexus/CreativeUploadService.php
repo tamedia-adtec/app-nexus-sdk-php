@@ -57,7 +57,7 @@ class CreativeUploadService extends Api
         ];
 
         $url = self::getBaseUrl() . '?' . http_build_query($query);
-        $response = self::makeRequest($url, Api::GET, $data, $debugLogger);
+        $response = self::makeRequest($url, Api::POST, $data, $debugLogger);
 
         return new AppNexusObject($response, AppNexusObject::MODE_READ_WRITE);
     }
