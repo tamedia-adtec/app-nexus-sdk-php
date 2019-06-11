@@ -602,7 +602,7 @@ class Api
     {
         $curlOptions = [
             CURLOPT_VERBOSE => false,
-            CURLOPT_POST = true,
+            CURLOPT_POST => true,
             CURLOPT_URL => $url,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_SSL_VERIFYPEER => false,
