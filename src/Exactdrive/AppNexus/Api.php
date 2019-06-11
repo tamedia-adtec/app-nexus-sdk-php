@@ -128,8 +128,8 @@ class Api
      */
     public static function getBaseUrl()
     {
-        if ( ! self::$_baseUrl) {
-            throw new \Exception( 'AppNexus url was not set.' );
+        if (!self::$_baseUrl) {
+            throw new \Exception('AppNexus url was not set.');
         }
 
         return self::$_baseUrl;
@@ -142,10 +142,10 @@ class Api
      *
      * @param string $url
      */
-    public static function setBaseUrl( $url )
+    public static function setBaseUrl($url)
     {
         // make sure any extra characters are removed
-        self::$_baseUrl = rtrim( rtrim( $url ), '/\\' );
+        self::$_baseUrl = rtrim(rtrim($url), '/\\');
     }
 
     //-------------------------------------------------------------------------
@@ -159,8 +159,8 @@ class Api
      */
     public static function getPassword()
     {
-        if ( ! self::$_password) {
-            throw new \Exception( 'AppNexus password was not set.' );
+        if (!self::$_password) {
+            throw new \Exception('AppNexus password was not set.');
         }
 
         return self::$_password;
@@ -173,7 +173,7 @@ class Api
      *
      * @param string $password
      */
-    public static function setPassword( $password )
+    public static function setPassword($password)
     {
         self::$_password = $password;
     }
@@ -189,8 +189,8 @@ class Api
      */
     public static function getUserName()
     {
-        if ( ! self::$_userName) {
-            throw new \Exception( 'AppNexus username was not set.' );
+        if (!self::$_userName) {
+            throw new \Exception('AppNexus username was not set.');
         }
 
         return self::$_userName;
@@ -203,7 +203,7 @@ class Api
      *
      * @param string $userName
      */
-    public static function setUserName( $userName )
+    public static function setUserName($userName)
     {
         self::$_userName = $userName;
     }
@@ -219,8 +219,8 @@ class Api
      */
     public static function getDataDirectory()
     {
-        if ( ! self::$_dataDirectory) {
-            self::$_dataDirectory = __DIR__.'/../../../data/';
+        if (!self::$_dataDirectory) {
+            self::$_dataDirectory = __DIR__ . '/../../../data/';
         }
 
         return self::$_dataDirectory;
@@ -233,11 +233,11 @@ class Api
      *
      * @param string $dataDirectory
      */
-    public static function setDataDirectory( $dataDirectory = '' )
+    public static function setDataDirectory($dataDirectory = '')
     {
         self::$_dataDirectory = $dataDirectory;
         if ('' === self::$_dataDirectory) {
-            self::$_dataDirectory = __DIR__.'/../../../data/';
+            self::$_dataDirectory = __DIR__ . '/../../../data/';
         }
     }
 
@@ -252,7 +252,7 @@ class Api
      */
     public static function getTokenFile()
     {
-        if ( ! self::$tokenFile) {
+        if (!self::$tokenFile) {
             self::$tokenFile = '.appnexus_token';
         }
 
@@ -266,7 +266,7 @@ class Api
      *
      * @param string $tokenFile
      */
-    public static function setTokenFile( $tokenFile = '' )
+    public static function setTokenFile($tokenFile = '')
     {
         self::$tokenFile = $tokenFile;
         if ('' !== self::$tokenFile) {
@@ -277,14 +277,14 @@ class Api
     /**
      * Decode AppNexus Api Message.
      *
-     * @param  string $message Serialized message
+     * @param string $message Serialized message
      *
      * @return object          Decoded message
      */
-    public static function decodeMessage( $message )
+    public static function decodeMessage($message)
     {
-        $message        = unserialize( $message );
-        $decodedMessage = json_decode( $message['response'][0] );
+        $message = unserialize($message);
+        $decodedMessage = json_decode($message['response'][0]);
 
         return $decodedMessage;
     }
@@ -299,17 +299,17 @@ class Api
      *
      * @return array $response
      */
-    protected static function makeRequestRaw( $url, $type = self::GET, $data = null )
+    protected static function makeRequestRaw($url, $type = self::GET, $data = null)
     {
         // spit out debug info to app nexus logs
-        Monolog::addInfo( "Url: $url" );
-        Monolog::addInfo( 'Data: '.$data );
+        Monolog::addInfo("Url: $url");
+        Monolog::addInfo('Data: ' . $data);
 
         // grab authentication token
         $token = self::_getAuthenticationToken();
 
         // make request
-        $result = self::_makeRequest( $token, $url, $type, $data );
+        $result = self::_makeRequest($token, $url, $type, $data);
 
         return $result;
     }
@@ -326,7 +326,7 @@ class Api
      *
      * @throws \Exception
      */
-    protected static function makeRequest($url, $type = self::GET, $data = null, Logger $debugLogger = null )
+    protected static function makeRequest($url, $type = self::GET, $data = null, Logger $debugLogger = null)
     {
         // spit out debug info to app nexus logs
         if (!empty($debugLogger)) {
@@ -341,25 +341,29 @@ class Api
         $token = self::_getAuthenticationToken();
 
         // make request
-        $result = self::_makeRequest( $token, $url, $type, $data );
+        if (strpos($url, CreativeHTMLService::getBaseUrl()) !== false) {
+            $result = self::_makeRequestCreativeUploadService($token, $url, $data);
+        } else {
+            $result = self::_makeRequest($token, $url, $type, $data);
+        }
 
         if (!empty($debugLogger)) {
             $debugLogger->info('API call result: ' . json_encode($result));
         }
 
         // convert to hash and validate response
-        $json   = json_decode( $result, true );
-        $status = self::_isValid( $json );
+        $json = json_decode($result, true);
+        $status = self::_isValid($json);
         if ($status == self::ERR_NOAUTH) {
-            Monolog::addInfo( 'Token expired, re-authorizing...' );
+            Monolog::addInfo('Token expired, re-authorizing...');
 
             // request a new token, the old one is bad/expired
-            $token = self::_getAuthenticationToken( true );
+            $token = self::_getAuthenticationToken(true);
 
             // re-run the result
-            $result = self::_makeRequest( $token, $url, $type, $data );
-            $json   = json_decode( $result, true );
-            $status = self::_isValid( $json );
+            $result = self::_makeRequest($token, $url, $type, $data);
+            $json = json_decode($result, true);
+            $status = self::_isValid($json);
         }
 
         // Throw Exception if API response is invalid
@@ -367,13 +371,13 @@ class Api
         // the result. We serialize to store in the database
         if ($status != self::OK) {
             // $errorMsg = "Invalid AppNexus Response ($url): $requestParams => $result";
-            $apiCallData['data'][]     = json_encode( $data );
-            $apiCallData['response'][] = json_encode( $json['response'] );
-            throw new \Exception( serialize( $apiCallData ) );
+            $apiCallData['data'][] = json_encode($data);
+            $apiCallData['response'][] = json_encode($json['response']);
+            throw new \Exception(serialize($apiCallData));
         }
 
         // add result to logs...
-        Monolog::addInfo( $result );
+        Monolog::addInfo($result);
 
         return $json['response'];
     }
@@ -387,9 +391,9 @@ class Api
      */
     private static function getFileSystem()
     {
-        $adapter = new Local( self::getDataDirectory() );
+        $adapter = new Local(self::getDataDirectory());
 
-        return new Filesystem( $adapter );
+        return new Filesystem($adapter);
     }
 
     //-------------------------------------------------------------------------
@@ -406,30 +410,30 @@ class Api
      *
      * @throws \Exception
      */
-    private static function _isValid( $json )
+    private static function _isValid($json)
     {
         // validate input is of the correct type
-        if ( ! is_array( $json )) {
-            $errorMsg = 'Invalid type passed into Api::isValid method, '.'expected array, received '.gettype(
+        if (!is_array($json)) {
+            $errorMsg = 'Invalid type passed into Api::isValid method, ' . 'expected array, received ' . gettype(
                     $json
-                ).'.';
-            Monolog::addInfo( $errorMsg );
-            throw new \Exception( $errorMsg );
+                ) . '.';
+            Monolog::addInfo($errorMsg);
+            throw new \Exception($errorMsg);
         }
 
         // validate json
-        if ( ! array_key_exists( 'response', $json )) {
+        if (!array_key_exists('response', $json)) {
             $errorMsg = 'Invalid AppNexus response.';
-            Monolog::addInfo( $errorMsg );
-            throw new \Exception( $errorMsg );
+            Monolog::addInfo($errorMsg);
+            throw new \Exception($errorMsg);
         }
 
         // check error status
         $response = $json['response'];
-        if (array_key_exists( 'error', $response )) {
+        if (array_key_exists('error', $response)) {
             $errorMsg = 'AppNexus query received an error response.';
-            Monolog::addInfo( $errorMsg );
-            Monolog::addInfo( $response['error'] );
+            Monolog::addInfo($errorMsg);
+            Monolog::addInfo($response['error']);
 
             return $response['error_id'];
         }
@@ -450,10 +454,10 @@ class Api
     private static function _requestAuthenticationToken()
     {
         // spit out debug info to app nexus logs
-        Monolog::addInfo( 'Requesting AppNexus Api token...' );
+        Monolog::addInfo('Requesting AppNexus Api token...');
 
         // compile authorization url
-        $url = self::getBaseUrl().'/auth';
+        $url = self::getBaseUrl() . '/auth';
 
         // compile login json
         $auth = array(
@@ -465,28 +469,28 @@ class Api
 
         // set default curl options
         $curlOptions = array(
-            CURLOPT_VERBOSE        => false,
-            CURLOPT_URL            => $url,
+            CURLOPT_VERBOSE => false,
+            CURLOPT_URL => $url,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => json_encode( $auth ),
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode($auth),
         );
 
         // execute the curl request
         $curl = curl_init();
-        curl_setopt_array( $curl, $curlOptions );
-        $result = curl_exec( $curl );
-        Monolog::addInfo( $result );
+        curl_setopt_array($curl, $curlOptions);
+        $result = curl_exec($curl);
+        Monolog::addInfo($result);
 
         // convert to hash and validate response
-        $json   = json_decode( $result, true );
-        $status = self::_isValid( $json );
+        $json = json_decode($result, true);
+        $status = self::_isValid($json);
         if ($status != self::OK) {
             $errorMsg = "AppNexus authorization failed with: $status!";
-            throw new \Exception( $errorMsg );
+            throw new \Exception($errorMsg);
         }
 
         // return the token
@@ -502,19 +506,19 @@ class Api
      *
      * @return string $token
      */
-    private static function _getAuthenticationToken( $force = false )
+    private static function _getAuthenticationToken($force = false)
     {
         $token = array(
-            'token'   => '',
+            'token' => '',
             'created' => time(),
         );
 
         $fileSystem = self::getFileSystem();
-        $tokenFile  = self::getTokenFile();
+        $tokenFile = self::getTokenFile();
 
-        if ( ! self::$_token) {
-            if ($fileSystem->has( $tokenFile )) {
-                $token = unserialize( $fileSystem->read( $tokenFile ) );
+        if (!self::$_token) {
+            if ($fileSystem->has($tokenFile)) {
+                $token = unserialize($fileSystem->read($tokenFile));
             }
         } else {
             $token = self::$_token;
@@ -522,9 +526,9 @@ class Api
 
         // request a new token if older than 2 hours, if it does not exists or if forced to renew
         if (time() - $token['created'] > 7200 || '' === $token['token'] || $force) {
-            $token['token']   = self::_requestAuthenticationToken();
+            $token['token'] = self::_requestAuthenticationToken();
             $token['created'] = time();
-            $fileSystem->put( $tokenFile, serialize( $token ) );
+            $fileSystem->put($tokenFile, serialize($token));
         }
 
         self::$_token = $token;
@@ -544,35 +548,35 @@ class Api
      *
      * @return array $result
      */
-    private static function _makeRequest( $token, $url, $type = self::GET, $data = null )
+    private static function _makeRequest($token, $url, $type = self::GET, $data = null)
     {
         // set default curl options
         $curlOptions = array(
-            CURLOPT_VERBOSE        => false,
-            CURLOPT_URL            => $url,
+            CURLOPT_VERBOSE => false,
+            CURLOPT_URL => $url,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER     => array( "Authorization: $token", "Content-Type: application/json" ),
+            CURLOPT_HTTPHEADER => array("Authorization: $token", "Content-Type: application/json"),
         );
 
         // configure curl POST
         if ($type == self::POST) {
             $curlOptions[CURLOPT_POST] = true;
             if ($data) {
-                $curlOptions[CURLOPT_POSTFIELDS] = json_encode( $data, JSON_UNESCAPED_SLASHES );
+                $curlOptions[CURLOPT_POSTFIELDS] = json_encode($data);
             } else {
-                array_push( $curlOptions[CURLOPT_HTTPHEADER], 'Content-Length: 0' );
+                array_push($curlOptions[CURLOPT_HTTPHEADER], 'Content-Length: 0');
             }
 
             // configure curl PUT
         } elseif ($type == self::PUT) {
             $curlOptions[CURLOPT_CUSTOMREQUEST] = self::PUT;
             if ($data) {
-                $curlOptions[CURLOPT_POSTFIELDS] = json_encode( $data );
+                $curlOptions[CURLOPT_POSTFIELDS] = json_encode($data);
             } else {
-                array_push( $curlOptions[CURLOPT_HTTPHEADER], 'Content-Length: 0' );
+                array_push($curlOptions[CURLOPT_HTTPHEADER], 'Content-Length: 0');
             }
 
             // configure curl DELETE
@@ -582,8 +586,35 @@ class Api
 
         // execute the curl request
         $curl = curl_init();
-        curl_setopt_array( $curl, $curlOptions );
-        $result = curl_exec( $curl );
+        curl_setopt_array($curl, $curlOptions);
+        $result = curl_exec($curl);
+
+        return $result;
+    }
+
+    /**
+     * @param string $token
+     * @param string $url
+     * @param array|null $data
+     * @return string
+     */
+    private static function _makeRequestCreativeUploadService(string $token, string $url, array $data = null): string
+    {
+        $curlOptions = [
+            CURLOPT_VERBOSE => false,
+            CURLOPT_POST = true,
+            CURLOPT_URL => $url,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => array("Authorization: $token"),
+            CURLOPT_POSTFIELDS => $data,
+        ];
+
+        $curl = curl_init();
+        curl_setopt_array($curl, $curlOptions);
+        $result = curl_exec($curl);
 
         return $result;
     }
