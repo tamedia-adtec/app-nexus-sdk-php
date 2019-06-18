@@ -623,7 +623,7 @@ class Api
 
     private static function _makeRequestCreativeUploadService(string $token, string $url, array $data = null, Logger $debugLogger = null): string
     {
-        $file = realpath($data['file']);
+        $file = $data['file'];
         $result = shell_exec('curl -X POST -H "Authorization: ' . $token . '" --form "type=html" --form "file=@' . $file . '" "' . $url . '"');
         $debugLogger->log(LogLevel::DEBUG, $result);
 
