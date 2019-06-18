@@ -600,7 +600,7 @@ class Api
      * @param array|null $data
      * @return string
      */
-    private static function _makeRequestCreativeUploadService01(string $token, string $url, array $data = null): string
+    private static function _makeRequestCreativeUploadService(string $token, string $url, array $data = null): string
     {
         $curlOptions = [
             CURLOPT_VERBOSE => false,
@@ -619,14 +619,5 @@ class Api
         $result = curl_exec($curl);
 
         return $result;
-    }
-
-    private static function _makeRequestCreativeUploadService(string $token, string $url, array $data = null, Logger $debugLogger = null): string
-    {
-        $file = $data['file'];
-        $result = shell_exec("curl -X POST -H \"Authorization: $token\" --form \"type=html\" --form \"file=@$file\" \"$url\"");
-        $debugLogger->log(LogLevel::DEBUG, $result);
-
-        return json_decode($result);
     }
 }
