@@ -43,9 +43,9 @@ class CreativeUploadService extends Api
      *
      * @throws Exception
      *
-     * @return AppNexusObject
+     * @return string
      */
-    public static function uploadCreative(string $fileName, int $memberId, ?Logger $debugLogger): AppNexusObject
+    public static function uploadCreative(string $fileName, int $memberId, ?Logger $debugLogger): string
     {
         $query = [
             'member_id' => $memberId,
