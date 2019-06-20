@@ -288,6 +288,6 @@ class CreativeHTMLService extends Api
         }
 
         // return null if no valid fields found
-        return empty($pruned) ? null : ['creative' => $pruned];
+        return empty($pruned) ? null : ['creative-html' => $pruned];
     }
 }
